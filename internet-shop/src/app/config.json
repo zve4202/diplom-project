@@ -1,0 +1,5 @@
+{
+    "appTitle": "Музыкальная лавка",
+    "apiEndpoint": "http://localhost:8080/api/v1/",
+    "curs": 100
+}

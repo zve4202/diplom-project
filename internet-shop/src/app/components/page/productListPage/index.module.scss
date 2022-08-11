@@ -1,0 +1,27 @@
+.header_wrapper {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    // justify-content: center;
+    // background: rgb(199, 199, 199);
+    // height: 60px;
+}
+
+.sidebar_wrapper {
+    display: flex;
+    width: 250px;
+    margin-right: 10px;
+}
+
+.main_layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.content_wrapper {
+    width: 100%;
+}
+
+.section_wrapper {
+    padding: 5px;
+}

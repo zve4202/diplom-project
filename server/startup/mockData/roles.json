@@ -1,0 +1,12 @@
+[
+  {
+    "_id": "user",
+    "name": "Покупатель",
+    "color": "secondary"
+  },
+  {
+    "_id": "admin",
+    "name": "Администратор",
+    "color": "danger"
+  }
+]
