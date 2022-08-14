@@ -4,7 +4,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import "./index.css";
 import { Provider } from "react-redux";
 
-import App, { store } from "./app";
+import App, { store } from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 
