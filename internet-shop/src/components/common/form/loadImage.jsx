@@ -55,7 +55,7 @@ class LoadImage extends Component {
     render() {
         return (
             <div className=" cover-big media">
-                <label htmlFor="photo">Аватар</label>
+                <label htmlFor="photo">{this.props.title}</label>
                 <img
                     id="photo"
                     className="form-control media-object img-thumbnail cover-big"
@@ -76,7 +76,7 @@ class LoadImage extends Component {
                         onClick={() => this.fileInput.click()}
                         disabled={!this.props.canLoad}
                     >
-                        Загрузить аватар
+                        Загрузить {this.props.title.toLowerCase()}
                     </button>
                 </div>
             </div>
@@ -84,11 +84,13 @@ class LoadImage extends Component {
     }
 }
 
-LoadImage.defautProps = {
-    canLoad: true
+LoadImage.defaultProps = {
+    canLoad: true,
+    title: "Имидж"
 };
 
 LoadImage.propTypes = {
+    title: PropTypes.string,
     canLoad: PropTypes.bool.isRequired,
     data: PropTypes.object.isRequired,
     onChange: PropTypes.func

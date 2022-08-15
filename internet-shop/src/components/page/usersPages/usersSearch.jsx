@@ -7,14 +7,20 @@ import debounce from "../../../utils/debounce";
 const UsersSearch = ({ name, onSearch }) => {
     const dispatch = useDispatch();
     const query = useSelector((state) => state.setting.config[name].query);
-    const debouncedSearch = debounce(onSearch, 1000);
+    const debouncedSearch = debounce(onSearch, 500);
 
     const handleSearchQuery = ({ target }) => {
+        const newQuery = { ...query };
+        if (!target.value) {
+            delete newQuery.search;
+        } else {
+            newQuery.search = target.value;
+        }
+
         dispatch(
             updateSetting(name, {
                 query: {
-                    ...query,
-                    search: target.value
+                    ...newQuery
                 }
             })
         );
@@ -22,12 +28,13 @@ const UsersSearch = ({ name, onSearch }) => {
     };
 
     const clearFilter = () => {
-        dispatch(updateSetting(name, {}));
+        dispatch(updateSetting(name, { query: {} }));
         onSearch();
     };
 
     const isDisabled = () => {
-        return Object.keys(query).length > 0;
+        console.log(query);
+        return Object.keys(query).length === 0;
     };
 
     return (

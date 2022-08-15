@@ -120,12 +120,16 @@ const UserEditPage = () => {
     const isValid = Object.keys(errors).length === 0;
     const changed = JSON.stringify(user) !== JSON.stringify(data);
 
-    const handleShowPassvord = () => {
-        setData((prevState) => ({
-            ...prevState,
-            password: "",
-            new_password: true
-        }));
+    const handleShowPassword = () => {
+        const newData = { ...data };
+        if (newData.new_password) {
+            delete newData.new_password;
+            newData.password = user.password;
+        } else {
+            newData.password = "";
+            newData.new_password = true;
+        }
+        setData(newData);
     };
 
     return (
@@ -134,6 +138,7 @@ const UserEditPage = () => {
                 <div className="row">
                     <div className="col-auto">
                         <LoadImage
+                            title="Аватар"
                             data={data}
                             canLoad={sameUser}
                             onChange={handleChange}
@@ -159,7 +164,7 @@ const UserEditPage = () => {
                             />
                             <PasswordControl
                                 userId={data._id}
-                                onShow={handleShowPassvord}
+                                onShow={handleShowPassword}
                                 hideIf={isUpdated}
                             >
                                 <TextField

@@ -11,7 +11,7 @@ const sortMap = {
 
 const searchMap = {
     category: { field: "role" },
-    search: { field: "alias" }
+    search: { field: ["alias", "email"] }
 };
 
 exports.getAll = async function (req, res, next) {

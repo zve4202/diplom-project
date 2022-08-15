@@ -26,6 +26,7 @@ const PasswordControl = ({ userId, onShow, hideIf, children }) => {
                             role="button"
                             className="btn btn-close btn-outline-warning"
                             onClick={handleChange}
+                            title="Не менять пароль"
                         />
                     </div>
                 </div>
