@@ -7,13 +7,15 @@ import RadioField from "../../common/form/radioField";
 import { validator } from "../../../utils/validator";
 
 import { getAuth, getAuthError, signUp } from "../../../store/auth";
+import CheckBoxField from "../../common/form/checkBoxField";
 
 const defaultData = {
     name: "",
     email: "",
     password: "",
     sex: "male",
-    role: "user"
+    role: "user",
+    stayOn: false
 };
 
 const RegisterForm = () => {
@@ -120,8 +122,15 @@ const RegisterForm = () => {
                 value={data.sex}
                 name="sex"
                 onChange={handleChange}
-                label="Выберите ваш пол"
+                label="Укажите ваш пол"
             />
+            <CheckBoxField
+                value={data.stayOn}
+                onChange={handleChange}
+                name="stayOn"
+            >
+                Оставаться в системе
+            </CheckBoxField>
 
             <button
                 className="btn btn-primary w-100 mx-auto"

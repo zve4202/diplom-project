@@ -56,7 +56,7 @@ export const loadAuthUser = () => async (dispatch) => {
 };
 
 export const signIn =
-    ({ email, password }) =>
+    ({ email, password, stayOn }) =>
     async (dispatch, getState) => {
         dispatch(requested());
         try {
@@ -64,7 +64,7 @@ export const signIn =
                 email,
                 password
             });
-            setTokens(data);
+            setTokens({ ...data, stayOn });
             dispatch(resived(data.content));
         } catch (error) {
             const { code, message } = error.response.data.error;
@@ -91,7 +91,7 @@ export const signIn =
     };
 
 export const signUp =
-    ({ email, password, ...rest }) =>
+    ({ email, password, stayOn, ...rest }) =>
     async (dispatch, getState) => {
         dispatch(requested());
         try {
@@ -100,7 +100,7 @@ export const signUp =
                 password,
                 ...rest
             });
-            setTokens(data);
+            setTokens({ ...data, stayOn });
             dispatch(resived(data.content));
         } catch (error) {
             const { code, message } = error.response.data.error || error;
