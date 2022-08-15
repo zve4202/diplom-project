@@ -8,6 +8,6 @@ const admin = require("../middleware/admin.middleware");
 router.get("/auth", [auth], Controller.get);
 router.get("/", [auth, admin], Controller.getAll);
 router.get("/:userId", [auth, admin], Controller.get);
-router.patch("/:userId", [auth, admin], Controller.update);
+router.put("/:userId", [auth, admin], Controller.update);
 
 module.exports = router;

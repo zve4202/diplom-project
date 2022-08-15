@@ -11,15 +11,22 @@ import PasswordControl from "./passwordControl";
 import RoleControl from "./roleControl";
 
 import { getRoles, loadRoles } from "../../../../store/roles";
-import { getUser, loadUsers } from "../../../../store/users";
+import {
+    getUser,
+    getUsersState,
+    loadUsers,
+    updateUser
+} from "../../../../store/users";
 import { getAuth } from "../../../../store/auth";
+import LoadImage from "../../../common/form/loadImage";
 
 const defaultData = {
     name: "",
     email: "",
     password: "",
     sex: "male",
-    role: "user"
+    role: "user",
+    image: ""
 };
 
 const validatorConfig = {
@@ -61,16 +68,18 @@ const validatorConfig = {
 const UserEditPage = () => {
     const dispatch = useDispatch();
     const { userId } = useParams();
-    const auth = useSelector(getAuth());
+    const { currentUser } = useSelector(getAuth());
     const user = useSelector(getUser(userId));
-    const sameUser = auth && user && auth.currentUser._id === user._id;
+    const sameUser = currentUser && currentUser._id === userId;
+
+    const { isLoading, isUpdated, error } = useSelector(getUsersState());
 
     const roles = useSelector(getRoles());
     const [data, setData] = useState(defaultData);
 
     useEffect(() => {
         if (!user) {
-            dispatch(loadUsers());
+            dispatch(loadUsers(userId));
         }
         if (roles.length === 0) {
             dispatch(loadRoles());
@@ -88,12 +97,15 @@ const UserEditPage = () => {
         e.preventDefault();
         const isValid = validate();
         if (!isValid) return;
-        console.log(data);
+        dispatch(updateUser(data));
     };
 
     useEffect(() => {
-        validate();
+        if (!isLoading) {
+            validate();
+        }
     }, [data]);
+
     const handleChange = (target) => {
         setData((prevState) => ({
             ...prevState,
@@ -117,75 +129,99 @@ const UserEditPage = () => {
     };
 
     return (
-        <div className="col-md-6 mx-3">
-            <div>
-                <form onSubmit={handleSubmit}>
-                    <TextField
-                        label="Имя"
-                        name="name"
-                        value={data.name}
-                        onChange={handleChange}
-                        error={errors.name}
-                        readOnly={!sameUser}
-                    />
-                    <TextField
-                        label="Электронная почта"
-                        name="email"
-                        value={data.email}
-                        onChange={handleChange}
-                        error={errors.email}
-                        readOnly={!sameUser}
-                    />
-                    <PasswordControl
-                        userId={data._id}
-                        onShow={handleShowPassvord}
-                    >
-                        <TextField
-                            label="Новый пароль"
-                            type="password"
-                            name="password"
-                            value={data.password}
+        <>
+            <div className="col-md-6">
+                <div className="row">
+                    <div className="col-auto">
+                        <LoadImage
+                            data={data}
+                            canLoad={sameUser}
                             onChange={handleChange}
-                            error={errors.password}
                         />
-                    </PasswordControl>
-                    <RoleControl userId={data._id}>
-                        <SelectField
-                            label="Роль пользователя"
-                            defaultOption="Выбрать..."
-                            defaultValue={data.role}
-                            options={roles.map((role) => ({
-                                label: role.name,
-                                value: role._id
-                            }))}
-                            onChange={handleChange}
-                            name="role"
-                            value={data.role}
-                            error={errors.role}
-                            readOnly={sameUser}
-                        />
-                    </RoleControl>
-                    <RadioField
-                        options={[
-                            { name: "Мужчина", value: "male" },
-                            { name: "Женщина", value: "female" }
-                        ]}
-                        value={data.sex}
-                        name="sex"
-                        onChange={handleChange}
-                        label="Пол пользователя"
-                        readOnly={!sameUser}
-                    />
-                    <button
-                        type="submit"
-                        disabled={!(isValid && changed)}
-                        className="btn btn-primary w-100 mx-auto"
-                    >
-                        Обновить
-                    </button>
-                </form>
+                    </div>
+                    <div className="col">
+                        <form onSubmit={handleSubmit}>
+                            <TextField
+                                label="Имя"
+                                name="name"
+                                value={data.name}
+                                onChange={handleChange}
+                                error={errors.name}
+                                readOnly={!sameUser}
+                            />
+                            <TextField
+                                label="Электронная почта"
+                                name="email"
+                                value={data.email}
+                                onChange={handleChange}
+                                error={errors.email}
+                                readOnly={!sameUser}
+                            />
+                            <PasswordControl
+                                userId={data._id}
+                                onShow={handleShowPassvord}
+                                hideIf={isUpdated}
+                            >
+                                <TextField
+                                    label="Новый пароль"
+                                    type="password"
+                                    name="password"
+                                    value={data.password}
+                                    onChange={handleChange}
+                                    error={errors.password}
+                                />
+                            </PasswordControl>
+                            <RoleControl userId={data._id}>
+                                <SelectField
+                                    label="Роль пользователя"
+                                    defaultOption="Выбрать..."
+                                    defaultValue={data.role}
+                                    options={roles.map((role) => ({
+                                        label: role.name,
+                                        value: role._id
+                                    }))}
+                                    onChange={handleChange}
+                                    name="role"
+                                    value={data.role}
+                                    error={errors.role}
+                                    readOnly={sameUser}
+                                />
+                            </RoleControl>
+                            <RadioField
+                                options={[
+                                    { name: "Мужчина", value: "male" },
+                                    { name: "Женщина", value: "female" }
+                                ]}
+                                value={data.sex}
+                                name="sex"
+                                onChange={handleChange}
+                                label="Пол пользователя"
+                                readOnly={!sameUser}
+                            />
+                            <button
+                                type="submit"
+                                disabled={!(isValid && changed)}
+                                className="btn btn-primary w-100 mx-auto"
+                            >
+                                Обновить
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <div className="card-footer mt-3">
+                    <span className="me-2">Статус:</span>
+                    {changed && (
+                        <span className="text-primary">Данные изменены...</span>
+                    )}
+                    {error && <span className="text-danger">{error}</span>}
+                    {isUpdated && (
+                        <span className="text-success">
+                            Информация сохранена...
+                        </span>
+                    )}
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 

@@ -12,10 +12,13 @@ const SelectField = ({
     readOnly
 }) => {
     const handleChange = ({ target }) => {
+        if (readOnly) return;
         onChange({ name: target.name, value: target.value });
     };
     const getInputClasses = () => {
-        return "form-select" + (error ? " is-invalid" : "");
+        return readOnly
+            ? "form-select bg-secondary bg-opacity-10"
+            : "form-select" + (error ? " is-invalid" : "");
     };
 
     const optionsArray =
@@ -34,7 +37,6 @@ const SelectField = ({
                 name={name}
                 value={value}
                 onChange={handleChange}
-                disabled={readOnly}
             >
                 <option disabled value="">
                     {defaultOption}

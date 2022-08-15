@@ -8,7 +8,7 @@ const ContentWrapper = ({ menu, children }) => {
                 <i className={`bi ${menu.icon} me-2`} />
                 {menu.name}
             </div>
-            {children}
+            <div className="card-body">{children}</div>
         </div>
     );
 };

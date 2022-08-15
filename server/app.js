@@ -15,8 +15,11 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use(logger("common"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+
+const maxRequestBodySize = "1mb";
+app.use(express.json({ limit: maxRequestBodySize }));
+app.use(express.urlencoded({ extended: false, limit: maxRequestBodySize }));
+
 app.use(cookieParser());
 app.use("/index", (req, res, next) => {
     res.status(200).send({ message: "Server is up", status: 200 });
@@ -25,6 +28,7 @@ require("./routes")(app);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
+    console.log(req.body);
     next(createError(404));
 });
 

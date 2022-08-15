@@ -33,9 +33,7 @@ const SideBarWrapper = ({
                 </span>
                 {backBtn}
             </div>
-            <div
-            // className="card-body px-0"
-            >
+            <div className="card-body px-0">
                 {menuAfterChildren && children}
                 {menu.items && (
                     <div

@@ -37,7 +37,7 @@ const NavBar = () => {
                             </li>
                         )}
                     </ul>
-                    <div className="d-flex">
+                    <div className="nav d-flex">
                         <MenuBasket />
                         <MenuProfile />
                     </div>

@@ -10,10 +10,13 @@ const CheckBoxField = ({
     readOnly
 }) => {
     const handleChange = () => {
+        if (readOnly) return;
         onChange({ name: name, value: !value });
     };
     const getInputClasses = () => {
-        return "form-check-input" + (error ? " is-invalid" : "");
+        return readOnly
+            ? "form-check-input bg-secondary bg-opacity-10"
+            : "form-check-input" + (error ? " is-invalid" : "");
     };
     return (
         <div className="form-check mb-4">
@@ -24,7 +27,6 @@ const CheckBoxField = ({
                 id={name}
                 onChange={handleChange}
                 checked={value}
-                readOnly={readOnly}
             />
             <label className="form-check-label" htmlFor={name}>
                 {children}

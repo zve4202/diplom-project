@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import { getAuth } from "../../../../store/auth";
 
-const PasswordControl = ({ userId, onShow, children }) => {
+const PasswordControl = ({ userId, onShow, hideIf, children }) => {
     const { currentUser } = useSelector(getAuth());
 
     const [change, setChange] = useState(false);
@@ -12,15 +12,32 @@ const PasswordControl = ({ userId, onShow, children }) => {
         onShow();
     };
 
+    useEffect(() => {
+        if (hideIf) setChange(false);
+    }, [hideIf]);
+
     if (currentUser && currentUser._id === userId) {
         if (change) {
-            return children;
+            return (
+                <div className="row w-100">
+                    <div className="col">{children}</div>
+                    <div className="col-auto">
+                        <span
+                            role="button"
+                            className="btn btn-close btn-outline-warning"
+                            onClick={handleChange}
+                        />
+                    </div>
+                </div>
+            );
         } else {
             return (
                 <div className="mb-4">
+                    <label htmlFor="pass-btn">Пароль</label>
                     <span
+                        id="pass-btn"
                         role="button"
-                        className="btn btn-warning btn-sm"
+                        className="form-control btn btn-warning"
                         onClick={handleChange}
                     >
                         Изменить пароль
@@ -32,9 +49,14 @@ const PasswordControl = ({ userId, onShow, children }) => {
     return null;
 };
 
+PasswordControl.defaulProps = {
+    hideIf: false
+};
+
 PasswordControl.propTypes = {
     userId: PropTypes.string,
     onShow: PropTypes.func,
+    hideIf: PropTypes.bool,
     children: PropTypes.oneOfType([
         PropTypes.arrayOf(PropTypes.node),
         PropTypes.node

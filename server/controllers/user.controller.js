@@ -1,3 +1,5 @@
+const bcrypt = require("bcryptjs");
+
 const { DATA_UPDATED, DATA_RECEIVED, salt } = require("../config/config");
 const Model = require("../models/User");
 const { getSort, getMatching } = require("../utils/db_utils");
@@ -55,6 +57,7 @@ exports.get = async function (req, res, next) {
 exports.update = async function (req, res, next) {
     const { userId } = req.params;
     const user = { ...req.body };
+
     try {
         if (user.new_password) {
             delete user.new_password;

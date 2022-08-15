@@ -20,13 +20,14 @@ const UserPage = ({ userId }) => {
     // const history = useHistory();
     const dispatch = useDispatch();
     const user = useSelector(getUser(userId));
-
+    console.log("UserPage user 1", user);
     useEffect(() => {
         if (!user) {
+            console.log("UserPage user 2", user);
             dispatch(loadRoles());
-            dispatch(loadUsers());
+            dispatch(loadUsers(userId));
         }
-    }, []);
+    }, [user]);
 
     const onItemSelect = (item) => {
         dispatch(
@@ -44,7 +45,7 @@ const UserPage = ({ userId }) => {
                 selected={selectedMenu}
                 onItemSelect={onItemSelect}
             />
-            <ContentWrapper selected={selectedMenu}>
+            <ContentWrapper menu={selectedMenu}>
                 {selectedMenu.path === pathes.editPath && <UserEditPage />}
                 {selectedMenu.path === pathes.ordersPath && <UserOrders />}
             </ContentWrapper>

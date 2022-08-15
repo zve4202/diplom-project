@@ -3,12 +3,20 @@ import PropTypes from "prop-types";
 
 const RadioField = ({ options, name, onChange, value, label, readOnly }) => {
     const handleChange = ({ target }) => {
+        if (readOnly) return;
         onChange({ name: target.name, value: target.value });
     };
+
+    const getInputClasses = () => {
+        return readOnly
+            ? "form-control bg-secondary bg-opacity-10"
+            : "form-control";
+    };
+
     return (
         <div className="mb-4">
             <label className="form-label">{label}</label>
-            <div>
+            <div className={getInputClasses()}>
                 {options.map((option) => (
                     <div
                         key={option.name + "_" + option.value}
@@ -22,7 +30,8 @@ const RadioField = ({ options, name, onChange, value, label, readOnly }) => {
                             checked={option.value === value}
                             value={option.value}
                             onChange={handleChange}
-                            disabled={readOnly}
+                            readOnly={readOnly}
+                            // disabled={readOnly}
                         />
                         <label
                             className="form-check-label"

@@ -4,33 +4,58 @@ import PropTypes from "prop-types";
 import Table from "../../common/table";
 import { Link } from "react-router-dom";
 import Role from "./role";
+import UserPicture from "./user/userPicture";
 
-const UserTable = ({ name, users, onSort, ...rest }) => {
-    const columns = {
-        name: {
-            path: "name",
-            name: "Имя",
+const UserTable = ({ name, data, totalDocs, loading, onReload, ...rest }) => {
+    const columns = [
+        {
+            caption: "Фотка",
+            name: "image",
+            width: 79,
+            component: (user) => <UserPicture data={user} />
+        },
+        {
+            caption: "Имя",
+            name: "name",
+            sortable: true,
+            width: 300,
             component: (user) => (
                 <Link to={`/users/${user._id}`}>{user.name}</Link>
             )
         },
-        email: {
-            path: "email",
-            name: "E-Mail"
+        {
+            caption: "E-Mail",
+            name: "email",
+            sortable: true
         },
-        role: {
-            name: "Роль",
+        {
+            caption: "Роль",
+            name: "role",
             component: (user) => <Role roleId={user.role} />
         }
-    };
+    ];
 
-    return <Table name={name} onSort={onSort} columns={columns} data={users} />;
+    return (
+        <Table
+            {...{
+                name,
+                columns,
+                data,
+                totalDocs,
+                loading,
+                onReload,
+                ...rest
+            }}
+        />
+    );
 };
 
 UserTable.propTypes = {
     name: PropTypes.string.isRequired,
-    users: PropTypes.array.isRequired,
-    onSort: PropTypes.func.isRequired
+    data: PropTypes.array.isRequired,
+    totalDocs: PropTypes.number,
+    loading: PropTypes.bool.isRequired,
+    onReload: PropTypes.func.isRequired
 };
 
 export default UserTable;

@@ -1,17 +1,23 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import PropTypes from "prop-types";
 
 const TextField = ({ label, type, name, value, onChange, error, readOnly }) => {
     const [showPassword, setShowPassword] = useState(false);
+    const pasRef = useRef();
 
     const handleChange = ({ target }) => {
+        if (readOnly) return;
         onChange({ name: target.name, value: target.value });
     };
     const getInputClasses = () => {
-        return "form-control" + (error ? " is-invalid" : "");
+        return readOnly
+            ? "form-control bg-secondary bg-opacity-10"
+            : "form-control" + (error ? " is-invalid" : "");
     };
     const toggleShowPassword = () => {
         setShowPassword((prevState) => !prevState);
+        pasRef.current.focus();
+        pasRef.current.select();
     };
     return (
         <div className="mb-4">
@@ -23,11 +29,13 @@ const TextField = ({ label, type, name, value, onChange, error, readOnly }) => {
                     name={name}
                     value={value}
                     onChange={handleChange}
+                    // className="bg-secondary bg-opacity-25"
                     className={getInputClasses()}
                     readOnly={readOnly}
+                    ref={pasRef}
                 />
                 {type === "password" && (
-                    <button
+                    <div
                         className="btn btn-outline-secondary"
                         type="button"
                         onClick={toggleShowPassword}
@@ -37,7 +45,7 @@ const TextField = ({ label, type, name, value, onChange, error, readOnly }) => {
                                 "bi bi-eye" + (showPassword ? "-slash" : "")
                             }
                         ></i>
-                    </button>
+                    </div>
                 )}
                 {error && <div className="invalid-feedback">{error}</div>}
             </div>

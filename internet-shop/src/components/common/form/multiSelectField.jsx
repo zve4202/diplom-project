@@ -18,6 +18,13 @@ const MultiSelectField = ({
     const handleChange = (value) => {
         onChange({ name: name, value });
     };
+
+    const getInputClasses = () => {
+        return readOnly
+            ? "basic-multi-select bg-secondary bg-opacity-10"
+            : "basic-multi-select" + (error ? " is-invalid" : "");
+    };
+
     return (
         <div className="mb-4">
             <label className="form-label">{label}</label>
@@ -26,11 +33,10 @@ const MultiSelectField = ({
                 closeMenuOnSelect={false}
                 defaultValue={defaultValue}
                 options={optionsArray}
-                className="basic-multi-select"
+                className={getInputClasses()}
                 classNamePrefix="select"
                 onChange={handleChange}
                 name={name}
-                isDisabled={readOnly}
             />
         </div>
     );
