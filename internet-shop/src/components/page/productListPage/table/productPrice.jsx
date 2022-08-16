@@ -1,15 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import { curs } from "../../../../config.json";
-
 const ProductPrice = ({ price }) => {
-    const nf = Intl.NumberFormat();
-    const priceRub = nf.format(price * curs);
-    return <div className="text-nowrap">{priceRub} руб.</div>;
+    return <span className="text-nowrap ">{price} руб.</span>;
 };
 
 ProductPrice.propTypes = {
-    price: PropTypes.number.isRequired
+    price: PropTypes.string.isRequired
 };
 export default ProductPrice;

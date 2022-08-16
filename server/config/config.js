@@ -6,5 +6,6 @@ module.exports = {
     DATA_RECEIVED: "Данные получены",
     DATA_UPDATED: "Данные обновлены",
     DATA_DELETED: "Данные удалены",
-    DATA_CREATED: "Данные добавлены"
+    DATA_CREATED: "Данные добавлены",
+    DATA_NOT_FOUND: "Данные не найдены"
 };

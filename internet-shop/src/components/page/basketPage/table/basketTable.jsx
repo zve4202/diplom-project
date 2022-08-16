@@ -1,75 +1,96 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import ProductName from "./productName";
-import ProductQty from "./productQty";
-import ProductPrice from "./productPrice";
 import Table from "../../../common/table";
 import Barcode from "../../../ui/barcode";
-import ProductPicture from "./productPicture";
+import ProductPicture from "../../productListPage/table/productPicture";
+import ProductQty from "../../productListPage/table/productQty";
+import ProductPrice from "../../productListPage/table/productPrice";
+import ProductName from "../../productListPage/table/productName";
 
 const BasketTable = ({ name, data, totalDocs, loading, onReload, ...rest }) => {
+    const getData = (item) => {
+        const { qty, price, product } = item;
+        const { _id, count, title } = product;
+        const { format, barcode, label, style, origin } = title;
+        const nf = Intl.NumberFormat();
+
+        return {
+            _id,
+            title,
+            qty,
+            price,
+            priceFmt: nf.format(price),
+            count,
+            format,
+            label,
+            barcode,
+            style,
+            origin
+        };
+    };
+
     const columns = [
         {
             name: "image",
-            width: 79,
-            component: (product) => <ProductPicture data={product} />
+            width: 82,
+            component: (item) => <ProductPicture data={getData(item)} />
         },
         {
             caption: "Корзина",
             name: "add",
-            width: 120,
-            component: (product) => <ProductQty data={product} />
+            width: 190,
+            component: (item) => <ProductQty data={getData(item)} name={name} />
         },
         {
             caption: "Цена",
             name: "price",
             sortable: true,
             width: 115,
-            component: (product) => <ProductPrice price={product.price} />
+            component: (item) => <ProductPrice price={getData(item).priceFmt} />
         },
         {
             caption: "Наименоване",
             name: "name",
             sortable: true,
             width: 300,
-            component: (product) => <ProductName data={product} />
+            component: (item) => <ProductName data={getData(item)} />
         },
         {
             caption: "Формат",
             name: "format",
             sortable: true,
-            component: (product) => (
-                <div className="small">{product.title.format.name}</div>
+            component: (item) => (
+                <div className="small">{getData(item).format.name}</div>
             )
         },
         {
             caption: "Штрихкод",
             name: "barcode",
-            component: (product) => <Barcode barcode={product.title.barcode} />
+            component: (item) => <Barcode barcode={getData(item).barcode} />
         },
         {
             caption: "Лейбл",
             name: "label",
             sortable: true,
-            component: (product) => (
-                <div className="small">{product.title.label.name}</div>
+            component: (item) => (
+                <div className="small">{getData(item).label.name}</div>
             )
         },
         {
             caption: "Страна",
             name: "origin",
             sortable: true,
-            component: (product) => (
-                <div className="small">{product.title.origin}</div>
+            component: (item) => (
+                <div className="small">{getData(item).origin}</div>
             )
         },
         {
             caption: "Жанр",
             name: "style",
             sortable: true,
-            component: (product) => (
-                <div className="small">{product.title.style}</div>
+            component: (item) => (
+                <div className="small">{getData(item).style}</div>
             )
         }
     ];

@@ -4,9 +4,10 @@ import { useSelector, useDispatch } from "react-redux";
 import classNames from "classnames";
 
 import {
-    addBasket,
+    updateBasket,
     getBasketQty,
-    removeBasket
+    removeBasket,
+    removeBasketItem
 } from "../../../../store/basket";
 import {
     addReminder,
@@ -14,13 +15,13 @@ import {
     removeReminder,
     updateReminder
 } from "../../../../store/reminders";
-import { curs } from "../../../../config.json";
 
-const ProductQty = ({ data }) => {
+const ProductQty = ({ data, name }) => {
     const { title, price, count } = data;
     const inputB = useRef(null);
     const inputR = useRef(null);
     let qty = String(useSelector(getBasketQty(data._id)) || "");
+    const savedQty = Number(qty || 0);
     const reminder = useSelector(getReminder(title._id));
 
     const [reminderNeedFocus, setReminderNeedFocus] = useState(false);
@@ -42,46 +43,21 @@ const ProductQty = ({ data }) => {
     };
     const handleChange = ({ target }) => {
         const value = target.value.replace(/[^\d]/, "");
-        const numQty = checkValue(value);
-        if (numQty === 0) {
-            dispatch(removeBasket(data._id));
-        } else {
-            dispatch(
-                addBasket({
-                    id: data._id,
-                    qty: numQty,
-                    price: price * curs
-                })
-            );
-        }
+        updateOnServer(checkValue(value));
     };
 
     const removeOne = () => {
         inputB.current.focus();
-        const numQty = checkValue(Number(qty || "0") - 1);
+        const numQty =
+            name === "basket" ? 0 : checkValue(Number(qty || "0") - 1);
+        if (savedQty === numQty) return;
         if (numQty < 0) return;
-        if (numQty === 0) {
-            dispatch(removeBasket(data._id));
-        } else {
-            dispatch(
-                addBasket({
-                    id: data._id,
-                    qty: numQty,
-                    price: price * curs
-                })
-            );
-        }
+        updateOnServer(numQty);
     };
+
     const addOne = () => {
         inputB.current.focus();
-        const numQty = checkValue(Number(qty || "0") + 1);
-        dispatch(
-            addBasket({
-                id: data._id,
-                qty: numQty,
-                price: price * curs
-            })
-        );
+        updateOnServer(checkValue(Number(qty || "0") + 1));
     };
 
     const handleBlur = () => {
@@ -90,19 +66,28 @@ const ProductQty = ({ data }) => {
             return;
         } else if (!qty) return;
 
-        const numQty = Math.min(count, Math.max(0, Number(qty)));
+        updateOnServer(Math.min(count, Math.max(0, Number(qty))));
+    };
+
+    function updateOnServer(numQty) {
+        if (savedQty === numQty) return;
+
         if (numQty === 0) {
-            dispatch(removeBasket(data._id));
+            if (name === "product") {
+                dispatch(removeBasket(data._id));
+            } else {
+                dispatch(removeBasketItem(data._id));
+            }
         } else {
             dispatch(
-                addBasket({
-                    id: data._id,
+                updateBasket({
+                    _id: data._id,
                     qty: numQty,
-                    price: price * curs
+                    price
                 })
             );
         }
-    };
+    }
 
     const handleToggle = ({ target }) => {
         if (target.nodeName !== "SPAN") {
@@ -168,17 +153,24 @@ const ProductQty = ({ data }) => {
         dispatch(updateReminder(data));
     };
 
+    const inputTitle =
+        name === "product"
+            ? "Введите количество чтобы добавить товар в корзину"
+            : "Изменить количество в корзине.";
+
     if (count > 0) {
         return (
             <div className="input-group flex-nowrap">
-                <span
-                    className="input-group-text"
-                    title="Удалить 1"
-                    role="button"
-                    onClick={removeOne}
-                >
-                    <i className="bi bi-dash-circle"></i>
-                </span>
+                {name === "product" && (
+                    <span
+                        className="input-group-text"
+                        title="Удалить 1"
+                        role="button"
+                        onClick={removeOne}
+                    >
+                        <i className="bi bi-dash-circle"></i>
+                    </span>
+                )}
                 <input
                     ref={inputB}
                     type="text"
@@ -189,16 +181,28 @@ const ProductQty = ({ data }) => {
                     value={qty}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    title="Введите количество чтобы добавить товар в корзину"
+                    title={inputTitle}
                 />
-                <span
-                    className="input-group-text"
-                    title="Добавить 1"
-                    role="button"
-                    onClick={addOne}
-                >
-                    <i className="bi bi-plus-circle"></i>
-                </span>
+                {name === "product" && (
+                    <span
+                        className="input-group-text"
+                        title="Добавить 1"
+                        role="button"
+                        onClick={addOne}
+                    >
+                        <i className="bi bi-plus-circle"></i>
+                    </span>
+                )}
+                {name === "basket" && (
+                    <span
+                        className="input-group-text"
+                        title="Удалить"
+                        role="button"
+                        onClick={removeOne}
+                    >
+                        <i className="bi bi-x-circle" />
+                    </span>
+                )}
             </div>
         );
     } else {
@@ -256,6 +260,7 @@ const ProductQty = ({ data }) => {
 };
 
 ProductQty.propTypes = {
-    data: PropTypes.object.isRequired
+    data: PropTypes.object.isRequired,
+    name: PropTypes.string.isRequired
 };
 export default ProductQty;

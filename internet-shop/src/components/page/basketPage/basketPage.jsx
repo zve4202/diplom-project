@@ -3,31 +3,26 @@ import { useDispatch, useSelector } from "react-redux";
 
 import BasketSidebar from "./basketSidebar";
 import BasketTable from "./table/basketTable";
-import { loadBasket } from "../../../store/basket";
+import { loadBasketItems } from "../../../store/basket";
 import WorkScreen from "../../common/wrappers/workScreen";
 import menu from "./menu";
 import ContentWrapper from "../../common/wrappers/content";
 
 const BasketPage = () => {
     const dispatch = useDispatch();
+
+    const { productsLoading, data } = useSelector((state) => state.basket);
+    const { products, _id } = data;
     useEffect(() => {
-        dispatch(loadBasket());
-    }, []);
-
-    const { isLoading, basket } = useSelector((state) => state.basket);
-    const { products, docs } = basket;
-
-    const entities =
-        isLoading || !products
-            ? []
-            : docs.map((doc) => {
-                  const prod = products.find((prod) => prod._id === doc.id);
-                  if (prod) return { ...prod, qty: doc.qty, price: doc.price };
-                  return doc;
-              });
+        if (_id) {
+            dispatch(loadBasketItems(_id));
+        }
+    }, [_id]);
 
     const handleReload = () => {
-        dispatch(loadBasket());
+        if (_id) {
+            dispatch(loadBasketItems(_id));
+        }
     };
 
     return (
@@ -36,8 +31,8 @@ const BasketPage = () => {
             <ContentWrapper menu={menu.caption}>
                 <BasketTable
                     name={menu.name}
-                    data={entities}
-                    loading={isLoading}
+                    data={products || []}
+                    loading={productsLoading}
                     onReload={handleReload}
                 />
             </ContentWrapper>

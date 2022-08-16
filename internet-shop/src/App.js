@@ -30,10 +30,10 @@ function App() {
 
     useEffect(() => {
         dispatch(loadSetting());
+        dispatch(loadBasket());
         dispatch(loadAuthUser());
         dispatch(loadRoles());
         dispatch(loadCategories());
-        dispatch(loadBasket());
     }, []);
     useEffect(() => {
         dispatch(loadReminders());

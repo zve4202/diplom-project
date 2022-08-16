@@ -22,7 +22,7 @@ db.title_m = require("./TitleMerged");
 db.product = require("./Product");
 db.product_m = require("./ProductMerged");
 
-db.order = require("./Order");
-db.order_dtls = require("./OrderList");
+db.order = require("./Order").order;
+db.order_list = require("./OrderList").orderList;
 
 module.exports = db;

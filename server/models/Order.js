@@ -2,28 +2,26 @@ const { Schema, model } = require("mongoose");
 const { createId } = require("../utils/db_utils");
 const ObjectIdType = Schema.Types.ObjectId;
 
-const statuses = ["new, ordered", "pending", "assembled", "sent", "deleted"];
-module.exports = statuses;
+const statuses = [
+    "basket",
+    "new",
+    "ordered",
+    "pending",
+    "assembled",
+    "sent",
+    "deleted"
+];
 
 const schema = new Schema(
     {
         _id: { type: Number },
+        userIp: String,
         userId: { type: ObjectIdType, ref: "User" },
         status: {
             type: String,
             enum: statuses,
             required: true,
-            default: "new"
-        },
-        count: {
-            type: Number,
-            required: true,
-            default: 0
-        },
-        price: {
-            type: Number,
-            required: true,
-            default: 0
+            default: "basket"
         }
     },
     { timestamps: true }
@@ -35,4 +33,15 @@ schema.pre("save", async function (next) {
     }
     next();
 });
-module.exports = model("Order", schema);
+
+const order = model("Order", schema);
+
+order.collection.createIndex({
+    userIp: 1,
+    status: 1
+});
+module.exports = order;
+module.exports = {
+    order,
+    statuses
+};

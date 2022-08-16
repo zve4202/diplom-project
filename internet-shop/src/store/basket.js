@@ -1,20 +1,30 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import Service from "../services/basket.service";
-import { getValue, setValue } from "../services/localStorage.service";
 
-const BASKET_KEY = "basket-id";
-// docs = ["1","2" ...]
 const initialState = {
-    basket: {
+    data: {
+        _id: null,
         userId: null,
         docs: [],
+        products: [],
         totalQty: 0,
-        totalPrice: 0,
-        reminders: []
+        totalPrice: 0
     },
-    isLoading: true,
+
+    docsLoading: true,
+    productsLoading: false,
     error: null
+};
+
+const calcTotals = ({ docs }) => {
+    const totals = { totalQty: 0, totalPrice: 0 };
+    docs.forEach((item) => {
+        const { qty, price } = item;
+        totals.totalQty += qty;
+        totals.totalPrice += qty * price;
+    });
+    return totals;
 };
 
 const basketSlice = createSlice({
@@ -22,134 +32,122 @@ const basketSlice = createSlice({
     initialState,
     reducers: {
         requested(state) {
-            state.isLoading = true;
+            state.docsLoading = true;
             state.error = null;
         },
         resived(state, action) {
-            state.basket = action.payload;
-            state.isLoading = false;
+            const totals = calcTotals(action.payload);
+            state.data = { ...action.payload, ...totals };
+            state.docsLoading = false;
+        },
+        requestedItems(state) {
+            state.productsLoading = true;
+            state.error = null;
+        },
+        itemsResived(state, action) {
+            state.data.products = action.payload;
+            state.productsLoading = false;
         },
         update(state, action) {
-            const { docs } = state.basket;
-            const index = docs.findIndex((doc) => doc.id === action.payload.id);
+            const { docs } = state.data;
+            const index = docs.findIndex(
+                (doc) => doc._id === action.payload._id
+            );
             if (index < 0) {
                 docs.push(action.payload);
             } else {
                 docs[index] = action.payload;
             }
-            const totals = { totalQty: 0, totalPrice: 0 };
-            docs.forEach((item) => {
-                const { qty, price } = item;
-                totals.totalQty += qty;
-                totals.totalPrice += qty * price;
-            });
-            state.basket = { ...state.basket, docs, ...totals };
+            const totals = calcTotals({ docs });
+            state.data = { ...state.data, docs, ...totals };
+            state.docsLoading = false;
         },
         remove(state, action) {
-            const { docs } = state.basket;
-            const newdocs = docs.filter((item) => item.id !== action.payload);
-            const totals = { totalQty: 0, totalPrice: 0 };
-            newdocs.forEach((item) => {
-                const { qty, price } = item;
-                totals.totalQty += qty;
-                totals.totalPrice += qty * price;
-            });
-            state.basket = { ...state.basket, docs: newdocs, ...totals };
+            const { docs, products } = state.data;
+            const newdocs = docs.filter(
+                (item) => item.product !== action.payload
+            );
+            const newprods = products.filter(
+                (item) => item.product._id !== action.payload
+            );
+            const totals = calcTotals({ docs: newdocs });
+            state.data = {
+                ...state.data,
+                docs: newdocs,
+                products: newprods,
+                ...totals
+            };
+            state.docsLoading = false;
         },
         clear(state, action) {
             const docs = [];
             const totals = { totalQty: 0, totalPrice: 0 };
-            state.basket = { ...state.basket, docs, ...totals };
+            state.data = { ...state.data, docs, ...totals };
+            state.docsLoading = false;
         },
         requestFailed(state, action) {
-            state.isLoading = false;
+            state.docsLoading = false;
             state.error = action.payload;
-        },
-        updateReminder(state, action) {
-            const { reminders } = state.basket;
-            const index = reminders.findIndex(
-                (doc) => doc.id === action.payload.id
-            );
-            if (index < 0) {
-                reminders.push(action.payload);
-            } else {
-                reminders[index] = action.payload;
-            }
-            state.basket = { ...state.basket, reminders };
-        },
-        removeReminder(state, action) {
-            const { reminders } = state.basket;
-            const newReminders = reminders.filter(
-                (item) => item.id !== action.payload
-            );
-            state.basket = { ...state.basket, reminders: newReminders };
         }
     }
 });
 
 const { actions, reducer: basketReducer } = basketSlice;
-const { update, remove, clear, resived, requested, requestFailed } = actions;
+const {
+    update,
+    remove,
+    clear,
+    resived,
+    requestedItems,
+    itemsResived,
+    requested,
+    requestFailed
+} = actions;
 
 export const loadBasket = () => async (dispatch) => {
     dispatch(requested());
     try {
-        const basketId = getValue(BASKET_KEY);
-        if (basketId) {
-            const data = await Service.get(basketId);
-            const { content } = data;
+        const { content } = await Service.get();
+        dispatch(resived(content));
+    } catch (error) {
+        dispatch(requestFailed(error.message));
+    }
+};
 
-            dispatch(resived(content));
-        } else {
-            const { content } = await Service.create({
-                ...initialState.basket
+export const loadBasketItems = (id) => async (dispatch, getState) => {
+    dispatch(requestedItems());
+    try {
+        const { content } = await Service.getItems(id);
+        dispatch(itemsResived(content));
+    } catch (error) {
+        dispatch(requestFailed(error.message));
+    }
+};
+
+export const updateBasket = (payload) => async (dispatch, getState) => {
+    try {
+        const { _id, docs } = getState().basket.data;
+
+        const doc = docs.find((doc) => doc.product === payload._id);
+        dispatch(requested());
+        if (doc) {
+            const { content } = await Service.update({
+                ...doc,
+                qty: payload.qty,
+                price: payload.price
             });
-            setValue(BASKET_KEY, content._id);
-            dispatch(resived(content));
+            console.log("add basket old content", content);
+            dispatch(update(content));
+        } else {
+            const { content } = await Service.update({
+                orderId: _id,
+                product: payload._id,
+                qty: payload.qty,
+                price: payload.price
+            });
+
+            dispatch(update(content));
         }
-    } catch (error) {
-        dispatch(requestFailed(error.message));
-    }
-};
-
-export const addBasket = (payload) => async (dispatch, getState) => {
-    try {
-        dispatch(update(payload));
-        const { basket } = getState().basket;
-        dispatch(requested());
-        const { content } = await Service.update(basket._id, basket);
-        dispatch(resived(content));
-    } catch (error) {
-        dispatch(requestFailed(error.message));
-    }
-};
-
-export const basketUpdateBasket = (payload) => async (dispatch, getState) => {
-    try {
-        dispatch(update(payload));
-        const { basket } = getState().basket;
-        await Service.update(basket._id, basket);
-    } catch (error) {
-        dispatch(requestFailed(error.message));
-    }
-};
-
-export const removeBasket = (id) => async (dispatch, getState) => {
-    try {
-        dispatch(remove(id));
-        const { basket } = getState().basket;
-        dispatch(requested());
-        const { content } = await Service.update(basket._id, basket);
-        dispatch(resived(content));
-    } catch (error) {
-        dispatch(requestFailed(error.message));
-    }
-};
-
-export const basketRemoveBasket = (id) => async (dispatch, getState) => {
-    try {
-        dispatch(remove(id));
-        const { basket } = getState().basket;
-        await Service.update(basket._id, basket);
     } catch (error) {
         dispatch(requestFailed(error.message));
     }
@@ -158,27 +156,49 @@ export const basketRemoveBasket = (id) => async (dispatch, getState) => {
 export const clearBasket = () => async (dispatch, getState) => {
     dispatch(requested());
     try {
-        dispatch(clear());
-        const { basket } = getState().basket;
+        const { data } = getState().basket;
         dispatch(requested());
-        const { content } = await Service.update(basket._id, basket);
-        dispatch(resived(content));
+        const { content } = await Service.deleteAll(data._id);
+        dispatch(clear(content));
     } catch (error) {
         dispatch(requestFailed(error.message));
     }
 };
 
-export const getBasket = () => (state) => state.basket.basket;
+export const removeBasket = (id) => async (dispatch, getState) => {
+    dispatch(requested());
+    try {
+        const { docs } = getState().basket.data;
+        const doc = docs.find((item) => item.product === id);
+        dispatch(remove(id));
+        await Service.delete(doc._id);
+    } catch (error) {
+        dispatch(requestFailed(error.message));
+    }
+};
+
+export const removeBasketItem = (id) => async (dispatch, getState) => {
+    dispatch(requested());
+    try {
+        const { docs } = getState().basket.data;
+        const doc = docs.find((item) => item.product === id);
+        dispatch(remove(id));
+        await Service.delete(doc._id);
+    } catch (error) {
+        dispatch(requestFailed(error.message));
+    }
+};
+
+export const getBasket = () => (state) => state.basket.data;
 export const getBasketQty = (id) => (state) => {
-    const { basket } = state.basket;
-    if (basket && basket.docs) {
-        const doc = basket.docs.find((item) => item.id === id);
+    const { docs } = state.basket.data;
+    if (docs) {
+        const doc = docs.find((item) => item.product === id);
         if (doc) return doc.qty;
     }
     return null;
 };
 
-export const getBasketLoading = () => (state) => state.basket.isLoading;
 export const getBasketError = () => (state) => state.basket.error;
 
 export default basketReducer;

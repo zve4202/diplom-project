@@ -6,14 +6,14 @@ const { statuses } = require("./Order");
 const schema = new Schema({
     _id: { type: Number },
     orderId: { type: Number, ref: "Order", required: true },
-    productId: { type: Number, ref: "Product", required: true },
+    product: { type: Number, ref: "V_product", required: true },
     status: {
         type: String,
         enum: statuses,
         required: true,
-        default: "ordered"
+        default: "basket"
     },
-    count: {
+    qty: {
         type: Number,
         required: true,
         default: 0
@@ -26,9 +26,11 @@ const schema = new Schema({
 });
 schema.pre("save", async function (next) {
     if (!this._id) {
-        this._id = await createId("orderlist");
+        this._id = await createId("orderline");
     }
     next();
 });
 
-module.exports = model("OrderList", schema);
+const orderList = model("Orderline", schema);
+orderList.collection.createIndex({ product: 1, orderId: 1 }, { unique: true });
+module.exports = orderList;
