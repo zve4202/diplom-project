@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import Service from "../services/reminder.service";
+import history from "../utils/history";
 import isOutdated from "../utils/isOutdated";
 
 // docs = ["1","2" ...]
@@ -70,6 +71,11 @@ export const loadReminders = () => async (dispatch, getState) => {
 };
 
 export const updateReminder = (payload) => async (dispatch, getState) => {
+    if (!getState().auth.currentUser) {
+        history.push("/login");
+        return;
+    }
+
     dispatch(requested());
     try {
         const { content } = await Service.update(payload.titleId, payload);
@@ -80,6 +86,10 @@ export const updateReminder = (payload) => async (dispatch, getState) => {
 };
 
 export const addReminder = (payload) => async (dispatch, getState) => {
+    if (!getState().auth.currentUser) {
+        history.push("/login");
+        return;
+    }
     dispatch(requested());
     try {
         const { content } = await Service.create(payload);

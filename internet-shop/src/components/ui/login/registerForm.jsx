@@ -8,6 +8,7 @@ import { validator } from "../../../utils/validator";
 
 import { getAuth, getAuthError, signUp } from "../../../store/auth";
 import CheckBoxField from "../../common/form/checkBoxField";
+import BackButton from "../../common/backButton";
 
 const defaultData = {
     name: "",
@@ -87,7 +88,10 @@ const RegisterForm = () => {
         e.preventDefault();
         const isValid = validate();
         if (!isValid) return;
-        dispatch(signUp(data));
+        const redirect = history.location.state
+            ? history.location.state.from.pathname
+            : "/";
+        dispatch(signUp({ ...data, redirect }));
     };
 
     return (
@@ -132,13 +136,17 @@ const RegisterForm = () => {
                 Оставаться в системе
             </CheckBoxField>
 
-            <button
-                className="btn btn-primary w-100 mx-auto"
-                type="submit"
-                disabled={!isValid}
-            >
-                Зарегистрировать
-            </button>
+            <div className="btn-group w-100 mx-auto" role="group">
+                <button
+                    className="btn btn-primary"
+                    type="submit"
+                    disabled={!isValid}
+                    title="Зарегистрироваться в системе"
+                >
+                    Зарегистрировать
+                </button>
+                <BackButton tooltip="Не регистрироваться" caption="Назад" />
+            </div>
         </form>
     );
 };

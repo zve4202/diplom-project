@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+import history from "../utils/history";
 import Service from "../services/auth.service";
 import {
     getAccessToken,
@@ -56,7 +57,7 @@ export const loadAuthUser = () => async (dispatch) => {
 };
 
 export const signIn =
-    ({ email, password, stayOn }) =>
+    ({ email, password, stayOn, redirect }) =>
     async (dispatch, getState) => {
         dispatch(requested());
         try {
@@ -66,6 +67,7 @@ export const signIn =
             });
             setTokens({ ...data, stayOn });
             dispatch(resived(data.content));
+            history.push(redirect);
         } catch (error) {
             const { code, message } = error.response.data.error;
             if (code === 400) {
@@ -91,7 +93,7 @@ export const signIn =
     };
 
 export const signUp =
-    ({ email, password, stayOn, ...rest }) =>
+    ({ email, password, stayOn, redirect, ...rest }) =>
     async (dispatch, getState) => {
         dispatch(requested());
         try {
@@ -102,6 +104,7 @@ export const signUp =
             });
             setTokens({ ...data, stayOn });
             dispatch(resived(data.content));
+            history.push(redirect);
         } catch (error) {
             const { code, message } = error.response.data.error || error;
             if (code === 400) {

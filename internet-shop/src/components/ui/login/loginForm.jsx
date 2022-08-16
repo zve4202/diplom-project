@@ -6,6 +6,7 @@ import TextField from "../../common/form/textField";
 import CheckBoxField from "../../common/form/checkBoxField";
 import { validator } from "../../../utils/validator";
 import { getAuth, getAuthError, signIn } from "../../../store/auth";
+import BackButton from "../../common/backButton";
 
 const LoginForm = () => {
     const { currentUser } = useSelector(getAuth());
@@ -61,7 +62,11 @@ const LoginForm = () => {
         e.preventDefault();
         const isValid = validate();
         if (!isValid) return;
-        dispatch(signIn(data));
+        const redirect = history.location.state
+            ? history.location.state.from.pathname
+            : "/";
+
+        dispatch(signIn({ ...data, redirect }));
     };
     return (
         <form onSubmit={handleSubmit}>
@@ -88,13 +93,17 @@ const LoginForm = () => {
                 Оставаться в системе
             </CheckBoxField>
             {enterError && <p className="text-danger">{enterError}</p>}
-            <button
-                className="btn btn-primary w-100 mx-auto"
-                type="submit"
-                disabled={!isValid}
-            >
-                Войти
-            </button>
+            <div className="btn-group w-100 mx-auto" role="group">
+                <button
+                    className="btn btn-primary"
+                    type="submit"
+                    disabled={!isValid}
+                    title="Войти в систему"
+                >
+                    Войти
+                </button>
+                <BackButton tooltip="Не входить в систему" caption="Назад" />
+            </div>
         </form>
     );
 };
