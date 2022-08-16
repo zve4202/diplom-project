@@ -6,6 +6,7 @@ const db = {};
 db.mongoose = mongoose;
 
 db.sequence = require("./Sequence");
+db.setting = require("./Setting");
 
 db.role = require("./Role");
 db.user = require("./User");

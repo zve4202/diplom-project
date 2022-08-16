@@ -1,6 +1,7 @@
 const express = require("express");
-const userRoute = require("./user.route");
 const authRoute = require("./auth.route");
+const settingRoute = require("./setting.route");
+const userRoute = require("./user.route");
 const roleRoute = require("./role.route");
 const categoryRoute = require("./category.route");
 const productRoute = require("./product.route");
@@ -16,6 +17,7 @@ const reminderRoute = require("./reminder.route");
 const router = express.Router({ mergeParams: true });
 
 router.use("/auth", authRoute);
+router.use("/setting", settingRoute);
 
 router.use("/user", userRoute);
 router.use("/role", roleRoute);

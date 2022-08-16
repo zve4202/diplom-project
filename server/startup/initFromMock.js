@@ -69,6 +69,12 @@ async function InitEntities(name, data, model, ASIS = false) {
 }
 
 module.exports = async () => {
+    const settingExists = await models.setting.find();
+    if (settingExists.length === 0) {
+        await models.setting.create({ curs: 95, extra_charge: 10 });
+        debug(`setting in DB ${chalk.green("✓")}`);
+    }
+
     const usersExists = await models.user.find();
     if (usersExists.length !== usersMock.length) {
         const roles = await InitEntities("roles", rolesMock, models.role, true);

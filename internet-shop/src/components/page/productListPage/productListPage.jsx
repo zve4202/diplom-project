@@ -68,21 +68,18 @@ const ProductListPage = () => {
     const {
         docs: data,
         totalDocs,
-        isLoading: loading
+        productLoading: loading,
+        productLoaded: loaded
     } = useSelector((state) => state.products);
 
     useEffect(() => {
         dispatch(loadLabels());
-        dispatch(loadProducts());
+        if (!loaded) dispatch(loadProducts());
         dispatch(loadCategories());
         dispatch(loadFormats());
         dispatch(loadOrigins());
         dispatch(loadStyles());
     }, []);
-
-    // useEffect(() => {
-    //     window.scrollTo(0, 0);1
-    // }, [docs]);
 
     const onReload = () => {
         dispatch(loadProducts());
