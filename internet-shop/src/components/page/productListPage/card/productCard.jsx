@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import ProductPicture from "../../../ui/productPicture";
-import { curs } from "../../../../config.json";
+
 import { useHistory } from "react-router-dom";
 import ProductQty from "../table/productQty";
 import ProductMenuBasket from "./productMenuBasket";
@@ -15,7 +15,7 @@ const ProductCard = ({ product }) => {
     const productScheme = {
         article: { cation: "Артикул", field: "article" },
         quality: { cation: "Качество", field: "quality" },
-        price: { cation: "Цена", field: "price" },
+        price_ru: { cation: "Цена", field: "price" },
         barcode: { cation: "Штрихкод", field: "title.barcode" },
         artist: { cation: "Исполнитель", field: "title.artist.name" },
         title: { cation: "Альбом", field: "title.name" },
@@ -30,9 +30,9 @@ const ProductCard = ({ product }) => {
         let value = product;
         for (const field of String(fields).split(".")) {
             value = value[field];
-            if (field === "price") {
+            if (field === "price_ru") {
                 const nf = Intl.NumberFormat();
-                value = nf.format(value * curs) + " руб.";
+                value = nf.format(value) + " руб.";
             }
         }
         return <strong>{value}</strong>;

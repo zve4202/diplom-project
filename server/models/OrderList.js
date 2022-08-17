@@ -13,6 +13,7 @@ const schema = new Schema({
         required: true,
         default: "basket"
     },
+    needQty: Number,
     qty: {
         type: Number,
         required: true,

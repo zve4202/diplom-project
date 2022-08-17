@@ -11,7 +11,7 @@ const UserTable = ({ name, data, totalDocs, loading, onReload, ...rest }) => {
         {
             caption: "Фотка",
             name: "image",
-            width: 79,
+            width: 85,
             component: (user) => <UserPicture data={user} />
         },
         {

@@ -1,7 +1,7 @@
 const { order, statuses } = require("../models/Order");
 const orderList = require("../models/OrderList");
+const product = require("../models/Product");
 
-const { Types } = require("mongoose");
 const {
     DATA_CREATED,
     DATA_UPDATED,
@@ -26,8 +26,10 @@ const agg = (match) => [
 
 exports.get = async function (req, res, next) {
     const { ip } = req;
-    const status = statuses[0];
-    const match = req.match ? req.match : { userIp: ip, status };
+    const status = [statuses[0], statuses[1]];
+    const match = req.match
+        ? req.match
+        : { userIp: ip, status: { $in: status } };
     try {
         const data = await order.aggregate(agg(match));
         if (data.length === 0) {
@@ -52,7 +54,6 @@ exports.add = async function (req, res, next) {
             req.match = { _id: data._id };
             return next();
         }
-        console.log("basket data add", data);
 
         return res.status(404).json({
             status: 404,
@@ -182,25 +183,48 @@ exports.apply = async function (req, res, next) {
 };
 
 exports.check = async function (req, res, next) {
-    const { id } = req.params;
     try {
-        // TODO
-        // const { docs } = req.body;
-        // const totals = { totalQty: 0, totalPrice: 0 };
-        // docs.forEach((item) => {
-        //     const { qty, price } = item;
-        //     totals.totalQty += qty;
-        //     totals.totalPrice += qty * price;
-        // });
+        const { _id, docs } = req.body;
+        docs.forEach(async (item) => {
+            const needQty = item.qty;
+            const product = await product.findOneAndUpdate(
+                { _id: item.product },
+                { $inc: { count: -item.qty } },
+                {
+                    new: true
+                }
+            );
+            if (product.count < 0) {
+                const qty = product.count + item.qty;
+                item.qty = Math.max(0, qty);
+                await product.findOneAndUpdate(
+                    { _id: item.product },
+                    { $inc: { count: -qty } },
+                    {
+                        new: true
+                    }
+                );
+            }
 
-        // const data = await order.findByIdAndUpdate(
-        //     id,
-        //     { ...req.body, ...totals },
-        //     { new: true }
-        // );
+            if (item.qty !== needQty) {
+                item.needQty = needQty;
+                if (item.qty === 0) {
+                    item.status = statuses[statuses.length - 1];
+                }
+                item.status = statuses[statuses.length - 2];
+            } else item.status = statuses[1];
+
+            await orderList.findByIdAndUpdate(item._id, item);
+        });
+
+        const data = await order.findByIdAndUpdate(_id, {
+            ...req.body,
+            status: statuses[1]
+        });
+
         return res.status(200).json({
             status: 200,
-            content: null,
+            content: data,
             message: DATA_UPDATED
         });
     } catch (e) {

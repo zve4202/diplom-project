@@ -17,7 +17,7 @@ import {
 } from "../../../../store/reminders";
 
 const ProductQty = ({ data, name }) => {
-    const { title, price, count } = data;
+    const { title, priceRub, count } = data;
     const inputB = useRef(null);
     const inputR = useRef(null);
     let qty = String(useSelector(getBasketQty(data._id)) || "");
@@ -83,7 +83,7 @@ const ProductQty = ({ data, name }) => {
                 updateBasket({
                     _id: data._id,
                     qty: numQty,
-                    price
+                    price: priceRub
                 })
             );
         }
@@ -111,7 +111,7 @@ const ProductQty = ({ data, name }) => {
             };
             switch (target.id) {
                 case "to-order":
-                    data = { ...data, need: 1, price };
+                    data = { ...data, need: 1, price: priceRub };
                     setReminderNeedFocus(true);
                     break;
                 case "notify-me":
@@ -136,7 +136,7 @@ const ProductQty = ({ data, name }) => {
         }
 
         need = Math.max(1, Number(need));
-        const data = { titleId: title._id, action, need, price };
+        const data = { titleId: title._id, action, need, price: priceRub };
         dispatch(updateReminder(data));
     };
 
@@ -149,7 +149,7 @@ const ProductQty = ({ data, name }) => {
 
         if (need === text) return;
         need = Math.max(1, Number(text));
-        const data = { titleId: title._id, action, need, price };
+        const data = { titleId: title._id, action, need, price: priceRub };
         dispatch(updateReminder(data));
     };
 

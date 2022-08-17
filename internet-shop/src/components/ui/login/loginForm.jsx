@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
+import history from "../../../utils/history";
 
 import TextField from "../../common/form/textField";
 import CheckBoxField from "../../common/form/checkBoxField";
 import { validator } from "../../../utils/validator";
-import { getAuth, getAuthError, signIn } from "../../../store/auth";
+import {
+    // getAuth,
+    getAuthError,
+    signIn
+} from "../../../store/auth";
 import BackButton from "../../common/backButton";
 
 const LoginForm = () => {
-    const { currentUser } = useSelector(getAuth());
+    // const { currentUser } = useSelector(getAuth());
     const error = useSelector(getAuthError());
 
-    const history = useHistory();
     const dispatch = useDispatch();
     const [data, setData] = useState({
         email: "",
@@ -22,12 +25,16 @@ const LoginForm = () => {
     const [errors, setErrors] = useState({});
     const [enterError, setEnterError] = useState(null);
     useEffect(() => {
-        if (currentUser) {
-            history.push("/");
-        } else if (error) {
+        // if (currentUser) {
+        //     history.push("/");
+        // } else
+        if (error) {
             setEnterError(error);
         }
-    }, [currentUser, error]);
+    }, [
+        // currentUser,
+        error
+    ]);
 
     const handleChange = (target) => {
         setData((prevState) => ({
@@ -62,10 +69,10 @@ const LoginForm = () => {
         e.preventDefault();
         const isValid = validate();
         if (!isValid) return;
+
         const redirect = history.location.state
             ? history.location.state.from.pathname
             : "/";
-
         dispatch(signIn({ ...data, redirect }));
     };
     return (

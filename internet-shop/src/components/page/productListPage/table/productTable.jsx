@@ -7,7 +7,6 @@ import ProductPicture from "./productPicture";
 import Barcode from "../../../ui/barcode";
 import ProductPrice from "./productPrice";
 import ProductQty from "./productQty";
-import { curs } from "../../../../config.json";
 
 const ProductTable = ({
     name,
@@ -18,16 +17,15 @@ const ProductTable = ({
     ...rest
 }) => {
     const getData = (item) => {
-        const { _id, count, title, price } = item;
+        const { _id, count, title, priceRub } = item;
         const { format, barcode, label, style, origin } = title;
         const nf = Intl.NumberFormat();
-        const priceRub = price * curs;
 
         return {
             _id,
             title,
             count,
-            price: priceRub,
+            priceRub,
             priceFmt: nf.format(priceRub),
             format,
             label,
@@ -40,7 +38,7 @@ const ProductTable = ({
     const columns = [
         {
             name: "image",
-            width: 82,
+            width: 85,
             component: (item) => <ProductPicture data={getData(item)} />
         },
         {

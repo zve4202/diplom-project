@@ -13,7 +13,8 @@ const schema = new mongoose.Schema(
         password: { type: String, required: true },
         sex: { type: String, enum: sexes, required: true },
         role: { type: String, ref: "Role" },
-        image: { type: String }
+        image: { type: String },
+        property: { type: Object }
     },
     { timestamps: true }
 );

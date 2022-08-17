@@ -21,10 +21,14 @@ const basketService = {
     deleteAll: async (id) => {
         const { data } = await httpService.delete(endpoint + `all/${id}`);
         return data;
+    },
+    check: async (content) => {
+        const { data } = await httpService.put(endpoint + "check/", content);
+        return data;
+    },
+    apply: async (content) => {
+        const { data } = await httpService.put(endpoint + "apply/", content);
+        return data;
     }
-    // create: async (content) => {
-    //     const { data } = await httpService.post(endpoint, content);
-    //     return data;
-    // }
 };
 export default basketService;

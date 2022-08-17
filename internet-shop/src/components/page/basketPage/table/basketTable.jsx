@@ -30,17 +30,27 @@ const BasketTable = ({ name, data, totalDocs, loading, onReload, ...rest }) => {
         };
     };
 
+    const prouctQty = (data) => {
+        if (rest.readOnly) {
+            return (
+                <div className="form-control bg-secondary bg-opacity-10 text-center">
+                    {data.qty}
+                </div>
+            );
+        }
+        return <ProductQty data={data} />;
+    };
     const columns = [
         {
             name: "image",
-            width: 82,
+            width: 85,
             component: (item) => <ProductPicture data={getData(item)} />
         },
         {
             caption: "Корзина",
             name: "add",
             width: 190,
-            component: (item) => <ProductQty data={getData(item)} name={name} />
+            component: (item) => prouctQty(getData(item))
         },
         {
             caption: "Цена",

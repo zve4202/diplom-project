@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import history from "../../../utils/history";
 
 import TextField from "../../common/form/textField";
 import RadioField from "../../common/form/radioField";
@@ -24,7 +24,6 @@ const RegisterForm = () => {
     const error = useSelector(getAuthError());
     const dispatch = useDispatch();
 
-    const history = useHistory();
     const [data, setData] = useState(defaultData);
     const [errors, setErrors] = useState({});
 

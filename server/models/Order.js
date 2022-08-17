@@ -4,12 +4,16 @@ const ObjectIdType = Schema.Types.ObjectId;
 
 const statuses = [
     "basket",
+    "checked",
     "new",
     "ordered",
     "pending",
     "assembled",
     "sent",
-    "deleted"
+    "delivered",
+    "cancelled",
+    "partly",
+    "unavailable"
 ];
 
 const schema = new Schema(

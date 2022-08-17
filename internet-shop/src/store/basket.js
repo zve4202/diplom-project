@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import Service from "../services/basket.service";
+import history from "../utils/history";
 
 const initialState = {
     data: {
@@ -81,8 +82,9 @@ const basketSlice = createSlice({
         },
         clear(state, action) {
             const docs = [];
+            const products = [];
             const totals = { totalQty: 0, totalPrice: 0 };
-            state.data = { ...state.data, docs, ...totals };
+            state.data = { ...state.data, docs, products, ...totals };
             state.docsLoading = false;
         },
         requestFailed(state, action) {
@@ -157,9 +159,60 @@ export const clearBasket = () => async (dispatch, getState) => {
     dispatch(requested());
     try {
         const { data } = getState().basket;
-        dispatch(requested());
         const { content } = await Service.deleteAll(data._id);
         dispatch(clear(content));
+    } catch (error) {
+        dispatch(requestFailed(error.message));
+    }
+};
+
+export const checkBasket = () => async (dispatch, getState) => {
+    const { data } = getState().basket;
+    const currentUser = getState().auth.currentUser;
+    if (!currentUser) {
+        history.push({
+            pathname: "/login",
+            state: {
+                from: {
+                    pathname: "/basket/check"
+                }
+            }
+        });
+        return;
+    }
+    const userdata = { ...data, userId: currentUser };
+
+    dispatch(requested());
+    try {
+        dispatch(requested());
+        const { content } = await Service.check(userdata);
+        dispatch(resived(content));
+    } catch (error) {
+        dispatch(requestFailed(error.message));
+    }
+};
+
+export const applyBasket = () => async (dispatch, getState) => {
+    const { data } = getState().basket;
+    const currentUser = getState().auth.currentUser;
+    if (!currentUser) {
+        history.push({
+            pathname: "/login",
+            state: {
+                from: {
+                    pathname: "/basket/apply"
+                }
+            }
+        });
+        return;
+    }
+    const userdata = { ...data, userId: currentUser };
+
+    dispatch(requested());
+    try {
+        dispatch(requested());
+        const { content } = await Service.apply(userdata);
+        dispatch(resived(content));
     } catch (error) {
         dispatch(requestFailed(error.message));
     }

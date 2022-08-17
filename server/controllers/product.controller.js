@@ -1,5 +1,5 @@
 const { getSort, getMatching, createId } = require("../utils/db_utils");
-const { product_m, product } = require("../models");
+const { product_m, product, setting } = require("../models");
 
 const {
     DATA_CREATED,
@@ -31,7 +31,7 @@ const sortMap = {
 
 exports.getAll = async function (req, res, next) {
     try {
-        console.log("req.params, req.query", req.params, req.query);
+        // console.log("req.params, req.query", req.params, req.query);
         const { query } = req;
         const options = {
             page: query.page || 1,
@@ -49,12 +49,15 @@ exports.getAll = async function (req, res, next) {
         let match = getMatching(query, searchMap);
         if (query.inStock) {
         }
-        console.log("query, match", query, match);
+        // console.log("query, match", query, match);
 
         const aggregate = match
             ? product_m.aggregate(match, { allowDiskUse: true })
             : {};
+
         const data = await product_m.aggregatePaginate(aggregate, options);
+        const { curs } = await setting.findById(1);
+        data.docs.forEach((item) => (item.priceRub = item.price * curs));
         return res.status(200).json({
             status: 200,
             content: data,

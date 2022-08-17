@@ -36,12 +36,8 @@ td.cover-small {
     width: 80px;
 }
 
-.input,
-td.input {
-    width: 80px !important;
-}
 .table-input {
-    width: 40px !important;
+    text-decoration: none;
 }
 
 .sidebar_wrapper {

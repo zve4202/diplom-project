@@ -44,7 +44,7 @@ function App() {
             <NavBar />
             {!isLoading && (
                 <Switch>
-                    <Route path="/basket" component={Basket} />
+                    <Route path="/basket/:step?" component={Basket} />
                     <ProtectedRoute path="/admin" exact component={Admin} />
                     <ProtectedRoute
                         path="/users/:userId/:edit?"
