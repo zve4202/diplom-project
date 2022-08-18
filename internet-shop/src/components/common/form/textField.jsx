@@ -1,9 +1,10 @@
-import React, { useRef, useState } from "react";
+import React, { forwardRef, useState } from "react";
 import PropTypes from "prop-types";
 
-const TextField = ({ label, type, name, value, onChange, error, readOnly }) => {
+const TextField = forwardRef((props, ref) => {
+    const { label, type, name, value, onChange, error, readOnly, ...rest } =
+        props;
     const [showPassword, setShowPassword] = useState(false);
-    const pasRef = useRef();
 
     const handleChange = ({ target }) => {
         if (readOnly) return;
@@ -11,16 +12,19 @@ const TextField = ({ label, type, name, value, onChange, error, readOnly }) => {
     };
     const getInputClasses = () => {
         return readOnly
-            ? "form-control bg-secondary bg-opacity-10"
-            : "form-control" + (error ? " is-invalid" : "");
+            ? "form-control form-control-sm bg-secondary bg-opacity-10"
+            : "form-control form-control-sm" + (error ? " is-invalid" : "");
     };
+
     const toggleShowPassword = () => {
         setShowPassword((prevState) => !prevState);
-        pasRef.current.focus();
-        pasRef.current.select();
+        if (ref) {
+            ref.current.focus();
+            ref.current.select();
+        }
     };
     return (
-        <div className="mb-4">
+        <div className={rest.className}>
             <label htmlFor={name}>{label}</label>
             <div className="input-group has-validation">
                 <input
@@ -29,14 +33,15 @@ const TextField = ({ label, type, name, value, onChange, error, readOnly }) => {
                     name={name}
                     value={value}
                     onChange={handleChange}
-                    // className="bg-secondary bg-opacity-25"
                     className={getInputClasses()}
                     readOnly={readOnly}
-                    ref={pasRef}
+                    placeholder={rest.placeholder || label}
+                    title={rest.placeholder || label}
+                    ref={ref}
                 />
                 {type === "password" && (
                     <div
-                        className="btn btn-outline-secondary"
+                        className="btn btn-sm btn-outline-secondary"
                         type="button"
                         onClick={toggleShowPassword}
                     >
@@ -47,22 +52,31 @@ const TextField = ({ label, type, name, value, onChange, error, readOnly }) => {
                         ></i>
                     </div>
                 )}
-                {error && <div className="invalid-feedback">{error}</div>}
+                {error && (
+                    <div
+                        className="invalid-feedback text-truncate"
+                        title={error}
+                    >
+                        {error}
+                    </div>
+                )}
             </div>
         </div>
     );
-};
+});
 TextField.defaultProps = {
     type: "text"
 };
 TextField.propTypes = {
-    label: PropTypes.string,
     type: PropTypes.string,
+    label: PropTypes.string,
     name: PropTypes.string,
     value: PropTypes.string,
     onChange: PropTypes.func,
     error: PropTypes.string,
     readOnly: PropTypes.bool
 };
+
+TextField.displayName = "TextField";
 
 export default TextField;

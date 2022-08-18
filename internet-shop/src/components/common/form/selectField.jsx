@@ -1,24 +1,28 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import PropTypes from "prop-types";
 
-const SelectField = ({
-    label,
-    value,
-    onChange,
-    defaultOption,
-    options,
-    error,
-    name,
-    readOnly
-}) => {
+const SelectField = forwardRef((props, ref) => {
+    const {
+        label,
+        value,
+        onChange,
+        defaultOption,
+        options,
+        error,
+        name,
+        readOnly,
+        ...rest
+    } = props;
+
+    console.log(label, value, onChange, defaultOption);
     const handleChange = ({ target }) => {
         if (readOnly) return;
         onChange({ name: target.name, value: target.value });
     };
     const getInputClasses = () => {
         return readOnly
-            ? "form-select bg-secondary bg-opacity-10"
-            : "form-select" + (error ? " is-invalid" : "");
+            ? "form-select form-select-sm bg-secondary bg-opacity-10"
+            : "form-select form-select-sm" + (error ? " is-invalid" : "");
     };
 
     const optionsArray =
@@ -27,16 +31,17 @@ const SelectField = ({
             : options;
 
     return (
-        <div className="mb-4">
-            <label htmlFor={name} className="form-label">
-                {label}
-            </label>
+        <div className={rest.className}>
+            <label htmlFor={name}>{label}</label>
             <select
                 className={getInputClasses()}
                 id={name}
                 name={name}
                 value={value}
                 onChange={handleChange}
+                placeholder={rest.placeholder || label}
+                readOnly={readOnly}
+                title={rest.placeholder || label}
             >
                 <option disabled value="">
                     {defaultOption}
@@ -51,6 +56,10 @@ const SelectField = ({
             {error && <div className="invalid-feedback">{error}</div>}
         </div>
     );
+});
+
+SelectField.defaultProps = {
+    defaultOption: "Выбрать..."
 };
 
 SelectField.propTypes = {
@@ -63,5 +72,6 @@ SelectField.propTypes = {
     name: PropTypes.string,
     readOnly: PropTypes.bool
 };
+SelectField.displayName = "TextField";
 
 export default SelectField;
