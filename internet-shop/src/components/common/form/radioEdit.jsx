@@ -1,7 +1,9 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import PropTypes from "prop-types";
 
-const RadioField = ({ options, name, onChange, value, label, readOnly }) => {
+const RadioEdit = forwardRef((props, ref) => {
+    const { options, name, onChange, value, label, readOnly, ...rest } = props;
+
     const handleChange = ({ target }) => {
         if (readOnly) return;
         onChange({ name: target.name, value: target.value });
@@ -14,8 +16,10 @@ const RadioField = ({ options, name, onChange, value, label, readOnly }) => {
     };
 
     return (
-        <div className="mb-4">
-            <label className="form-label">{label}</label>
+        <div className={rest.className}>
+            <label htmlFor={name}>
+                <span className="text-truncate">{label}</span>
+            </label>
             <div className={getInputClasses()}>
                 {options.map((option) => (
                     <div
@@ -44,9 +48,9 @@ const RadioField = ({ options, name, onChange, value, label, readOnly }) => {
             </div>
         </div>
     );
-};
+});
 
-RadioField.propTypes = {
+RadioEdit.propTypes = {
     options: PropTypes.array,
     name: PropTypes.string,
     onChange: PropTypes.func,
@@ -55,4 +59,6 @@ RadioField.propTypes = {
     readOnly: PropTypes.bool
 };
 
-export default RadioField;
+RadioEdit.displayName = "RadioEdit";
+
+export default RadioEdit;

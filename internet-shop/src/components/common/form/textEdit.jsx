@@ -1,19 +1,32 @@
 import React, { forwardRef, useState } from "react";
 import PropTypes from "prop-types";
 
-const TextField = forwardRef((props, ref) => {
-    const { label, type, name, value, onChange, error, readOnly, ...rest } =
+const TextEdit = forwardRef((props, ref) => {
+    const { type, label, name, value, onChange, error, readOnly, ...rest } =
         props;
+
     const [showPassword, setShowPassword] = useState(false);
+
+    // const nameCase = (value) => {
+    //     return value.replace(/\w\S*/g, function (txt) {
+    //         return (
+    //             Sttring(txt).charAt(0).toLocaleUpperCase() +
+    //             txt.substr(1).toLocaleLowerCase()
+    //         );
+    //     });
+    // };
 
     const handleChange = ({ target }) => {
         if (readOnly) return;
+        // if (rest.nameCase) {
+        //     target.value = target.value.replace("  ", " ");
+        // }
         onChange({ name: target.name, value: target.value });
     };
     const getInputClasses = () => {
         return readOnly
-            ? "form-control form-control-sm bg-secondary bg-opacity-10"
-            : "form-control form-control-sm" + (error ? " is-invalid" : "");
+            ? "form-control bg-secondary bg-opacity-10"
+            : "form-control" + (error ? " is-invalid" : "");
     };
 
     const toggleShowPassword = () => {
@@ -23,9 +36,16 @@ const TextField = forwardRef((props, ref) => {
             ref.current.select();
         }
     };
+
+    const style = rest.nameCase
+        ? { "text-transform": "capitalize" }
+        : undefined;
+
     return (
-        <div className={rest.className}>
-            <label htmlFor={name}>{label}</label>
+        <div key={rest.key} className={rest.className}>
+            <label htmlFor={name}>
+                <span className="text-truncate">{label}</span>
+            </label>
             <div className="input-group has-validation">
                 <input
                     type={showPassword ? "text" : type}
@@ -38,6 +58,8 @@ const TextField = forwardRef((props, ref) => {
                     placeholder={rest.placeholder || label}
                     title={rest.placeholder || label}
                     ref={ref}
+                    autoCapitalize={rest.autoCapitalize}
+                    style={style}
                 />
                 {type === "password" && (
                     <div
@@ -64,10 +86,10 @@ const TextField = forwardRef((props, ref) => {
         </div>
     );
 });
-TextField.defaultProps = {
+TextEdit.defaultProps = {
     type: "text"
 };
-TextField.propTypes = {
+TextEdit.propTypes = {
     type: PropTypes.string,
     label: PropTypes.string,
     name: PropTypes.string,
@@ -77,6 +99,6 @@ TextField.propTypes = {
     readOnly: PropTypes.bool
 };
 
-TextField.displayName = "TextField";
+TextEdit.displayName = "TextEdit";
 
-export default TextField;
+export default TextEdit;

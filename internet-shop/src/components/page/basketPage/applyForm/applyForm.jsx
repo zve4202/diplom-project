@@ -1,176 +1,103 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { Component } from "react";
+import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { useSelector } from "react-redux";
 
+import { applyBasket } from "../../../../store/basket";
 import fieldsMap from "./data";
 import {
-    // valueOfName,
-    createGroups
+    createDefaults,
+    createGroups,
+    defaultData,
+    validatorConfig
 } from "./utils";
 import { validator } from "../../../../utils/validator";
-import TextField from "../../../common/form/textField";
-import SelectField from "../../../common/form/selectField";
-import { getAuth } from "../../../../store/auth";
+// import SelectEdit from "../../../common/form/SelectEdit";
+// import TextEdit from "../../../common/form/TextEdit";
+// import PlaceIdField from "./placeIdField";
+// import MemoEdit from "../../../common/form/MemoEdit";
 
-// const defaultData = {};
-const defaultData = {
-    setId: "",
-    persone: "",
-    phone: "",
-    delivery: "",
-    payment: "",
-    index: "",
-    address: "",
-    note: ""
-};
-
-const defaultConfig = {};
-
-const createDefaults = () => {
-    // if (Object.keys(defaultData).length > 0) return;
-    Object.keys(fieldsMap).forEach((key) => {
-        // defaultData[key] = valueOfName(key);
-        creatValidConfiguration(key);
-    });
-};
-
-createDefaults();
-
-function addValidatorConfig(name, rule, message) {
-    if (defaultConfig[name]?.[rule]) return;
-    const config = defaultConfig[name] || {};
-    let newRule = { message: message };
-
-    if (typeof message === "object") {
-        newRule = { ...message };
+class ApplyForm extends Component {
+    constructor(props) {
+        super(props);
+        createDefaults();
+        this.state = { data: { ...defaultData }, errors: {} };
+        this.applyRefs = React.createRef();
+        this.handleCange = this.handleCange.bind(this);
     }
 
-    config[rule] = newRule;
-
-    defaultConfig[name] = config;
-}
-
-function creatValidConfiguration(name) {
-    const item = fieldsMap[name];
-
-    if (item.required) {
-        addValidatorConfig(name, "isRequired", "Обязательно для заполнения");
-    }
-    if (name === "password") {
-        addValidatorConfig(
-            name,
-            "isCapitalSymbol",
-            "Пароль должен содержать хотя бы одну заглавную букву"
-        );
-        addValidatorConfig(
-            name,
-            "isContainDigit",
-            "Пароль должен содержать хотя бы одно число"
-        );
-        addValidatorConfig(name, "min", {
-            message: "Пароль должен состоять минимум из 8 символов",
-            value: 8
-        });
-    }
-}
-
-const ApplyForm = (props) => {
-    const { step, validatorConfig = defaultConfig } = props;
-
-    const { currentUser } = useSelector(getAuth());
-    const status = useSelector((state) => state.basket.data.status);
-    const applyRefs = useRef();
-    const [data, setData] = useState(defaultData);
-
-    const [errors, setErrors] = useState({});
-
-    useEffect(() => {
-        validate();
-        console.log("data, validatorConfig", data, validatorConfig);
-    }, [data]);
-
-    useEffect(() => {
-        if (currentUser) {
-            handleCange("persone", currentUser.name);
+    componentDidMount() {
+        if (this.props.user) {
+            this.handleCange({ name: "persone", value: this.props.user.name });
         }
-    }, [currentUser]);
+    }
 
-    function validate() {
-        const errors = validator(data, validatorConfig);
-        setErrors(errors);
+    componentDidUpdate(prevProps, prevState) {
+        if (this.props.user?.name !== prevProps.user?.name) {
+            if (this.props.user && !this.state.persone) {
+                this.handleCange({
+                    name: "persone",
+                    value: this.state.persone
+                });
+            }
+        }
+        if (this.state.data !== prevState.data) {
+            this.validate();
+        }
+    }
+
+    handleCange({ name, value }) {
+        this.setState((prevState) => ({
+            ...prevState,
+            data: { ...prevState.data, [name]: value }
+        }));
+    }
+
+    setErrors(errors) {
+        this.setState((prevState) => ({
+            ...prevState,
+            errors: { ...errors }
+        }));
+    }
+
+    validate() {
+        const errors = validator(this.state.data, validatorConfig);
+        this.setErrors(errors);
         return Object.keys(errors).length === 0;
     }
 
-    const handleCange = (name, value) => {
-        console.log("data, validatorConfig", name, value);
-
-        setData((prevState) => ({
-            ...prevState,
-            [name]: value
-        }));
-    };
-
-    function getOptions(item) {
-        return Object.keys(item.src).map((key) => ({
+    getOptions(item) {
+        if (!item.src) return null;
+        return Object.keys(item.src).map((key, index) => ({
             value: item.src[key].value,
             label: item.src[key].label
         }));
     }
 
-    function createItem(name, index, classes) {
+    createItem(name, gKey, classes) {
         const classname = () => {
             const result = classes || "mb-1";
             return result;
         };
         const item = fieldsMap[name];
         const label = item.title;
-        const key = index + 1;
-        const ref = applyRefs;
-        const id = `item-${key}}`;
 
         const attr = {
+            key: gKey.key,
             name,
             label,
             className: classname(item),
-            onChange: handleCange,
+            value: this.state.data[name] || "",
+            onChange: this.handleCange,
             placeholder: item.placeholder || label,
-            value: data[name],
-            error: errors[name],
-            ref
+            error: this.state.errors[name],
+            options: this.getOptions(item)
         };
 
-        switch (item.component) {
-            case "TextField":
-                return <TextField key={key} {...attr} />;
-            case "SelectField":
-                return (
-                    <SelectField
-                        key={key}
-                        options={getOptions(item)}
-                        {...attr}
-                    />
-                );
-
-            default:
-                break;
-        }
-        return (
-            <div key={key} className="mb-1 ">
-                <label htmlFor={id}>{label}</label>
-                {item.type === "textarea" ? (
-                    <textarea key={key} {...props} />
-                ) : item.type === "select" ? (
-                    <select key={key} {...props}>
-                        {getOptions(item)}
-                    </select>
-                ) : (
-                    <input key={key} {...props} />
-                )}
-            </div>
-        );
+        return item.component(attr);
     }
 
-    function groupWrapper(key, group, gIndex) {
+    groupWrapper(key, group, gKey) {
+        gKey.key += 1;
         if (Array.isArray(group)) {
             return (
                 <div className="mb-1" key={key}>
@@ -180,65 +107,74 @@ const ApplyForm = (props) => {
                             const classCol = item.size
                                 ? "col-" + item.size
                                 : "col";
-                            return createItem(key, index, classCol);
+                            gKey.key += index;
+                            return this.createItem(key, gKey, classCol);
                         })}
                     </div>
                 </div>
             );
         } else {
-            return createItem(key, gIndex);
+            return this.createItem(key, gKey);
         }
     }
 
-    function createItems(data) {
-        const groups = createGroups(data);
+    createItems() {
+        const groups = createGroups(fieldsMap);
+        const gKey = {
+            key: 0
+        };
         return (
             <>
                 {Object.keys(groups).map((key, index) => {
                     const group = groups[key];
-                    return groupWrapper(key, group, index);
+
+                    return this.groupWrapper(key, group, gKey);
                 })}
             </>
         );
     }
 
-    // const { status, step } = props;
-    if (status === "basket") return null;
+    render() {
+        const { status, step } = this.props;
+        if (status === "basket") return null;
+        console.log("item", this.state);
 
-    return (
-        <div>
-            {step === "check" && (
-                <div className="form-control bg-success bg-opacity-10 text-md-center text-success">
-                    <span className="spinner-border spinner-border-sm  me-2" />
-                    Корзина на проверке...
-                </div>
-            )}
-            {status === "checked" && (
-                <div className="card col-md-8">
-                    <div className="card-header">
-                        <i className="bi bi-check2-square me-2" />
-                        Корзина проверена. Можно приступать к оформлению заказа.
+        return (
+            <div>
+                {step === "check" && (
+                    <div className="form-control bg-success bg-opacity-10 text-md-center text-success">
+                        <span className="spinner-border spinner-border-sm  me-2" />
+                        Корзина на проверке...
                     </div>
-                    <div className="card-body">{createItems(fieldsMap)}</div>
-                </div>
-            )}
-        </div>
-    );
-};
+                )}
+                {status === "checked" && (
+                    <div className="card col-md-8">
+                        <div className="card-header">
+                            <i className="bi bi-check2-square me-2" />
+                            Корзина проверена. Можно приступать к оформлению
+                            заказа.
+                        </div>
+                        <div className="card-body">{this.createItems()}</div>
+                    </div>
+                )}
+            </div>
+        );
+    }
+}
 
 ApplyForm.propTypes = {
     status: PropTypes.string,
     step: PropTypes.string.isRequired,
-    validatorConfig: PropTypes.object
+    user: PropTypes.object
 };
 
-// const mapStateToProps = (state) => ({
-//     status: state.basket.data.status,
-//     user: state.auth.currentUser
-// });
+const mapStateToProps = (state) => ({
+    status: state.basket.data.status,
+    user: state.auth.currentUser
+});
 
-// const mapDispatchToProps = {
-//     applyBasket
-// };
+const mapDispatchToProps = {
+    applyBasket
+};
 
-export default ApplyForm;
+export default connect(mapStateToProps, mapDispatchToProps)(ApplyForm);

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import history from "../../../utils/history";
 
-import TextField from "../../common/form/textField";
-import CheckBoxField from "../../common/form/checkBoxField";
+import TextEdit from "../../common/form/textEdit";
+import CheckBoxEdit from "../../common/form/checkBoxEdit";
 import { validator } from "../../../utils/validator";
 import {
     // getAuth,
@@ -13,7 +13,7 @@ import {
 import BackButton from "../../common/backButton";
 
 const LoginForm = () => {
-    // const { currentUser } = useSelector(getAuth());
+    const className = "mb-2";
     const error = useSelector(getAuthError());
 
     const dispatch = useDispatch();
@@ -77,28 +77,31 @@ const LoginForm = () => {
     };
     return (
         <form onSubmit={handleSubmit}>
-            <TextField
+            <TextEdit
                 label="Электронная почта"
                 name="email"
                 value={data.email}
                 onChange={handleChange}
                 error={errors.email}
+                className={className}
             />
-            <TextField
+            <TextEdit
                 label="Пароль"
                 type="password"
                 name="password"
                 value={data.password}
                 onChange={handleChange}
                 error={errors.password}
+                className={className}
             />
-            <CheckBoxField
+            <CheckBoxEdit
                 value={data.stayOn}
                 onChange={handleChange}
                 name="stayOn"
+                className={className}
             >
                 Оставаться в системе
-            </CheckBoxField>
+            </CheckBoxEdit>
             {enterError && <p className="text-danger">{enterError}</p>}
             <div className="btn-group w-100 mx-auto" role="group">
                 <button

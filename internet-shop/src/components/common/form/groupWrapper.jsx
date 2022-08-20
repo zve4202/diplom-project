@@ -1,9 +1,11 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import PropTypes from "prop-types";
 
-const GroupWrapper = ({ children }) => {
+const GroupWrapper = forwardRef((props, ref) => {
+    const { children, ...rest } = props;
+
     return (
-        <div className="mb-1">
+        <div className={rest.className}>
             <div className="row g-3">
                 {React.Children.map(children, (child, index) => (
                     <div className="col" key={index + 1}>
@@ -13,7 +15,7 @@ const GroupWrapper = ({ children }) => {
             </div>
         </div>
     );
-};
+});
 
 GroupWrapper.propTypes = {
     children: PropTypes.oneOfType([
@@ -21,5 +23,6 @@ GroupWrapper.propTypes = {
         PropTypes.node
     ])
 };
+GroupWrapper.displayName = "GroupWrapper";
 
 export default GroupWrapper;

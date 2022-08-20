@@ -1,14 +1,8 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import PropTypes from "prop-types";
 
-const CheckBoxField = ({
-    name,
-    value,
-    onChange,
-    children,
-    error,
-    readOnly
-}) => {
+const CheckEdit = forwardRef((props, ref) => {
+    const { name, value, onChange, children, error, readOnly, ...rest } = props;
     const handleChange = () => {
         if (readOnly) return;
         onChange({ name: name, value: !value });
@@ -27,15 +21,21 @@ const CheckBoxField = ({
                 id={name}
                 onChange={handleChange}
                 checked={value}
+                title={rest.placeholder}
+                ref={ref}
             />
-            <label className="form-check-label" htmlFor={name}>
-                {children}
+            <label htmlFor={name}>
+                <span className="text-truncate">{children}</span>
             </label>
-            {error && <div className="invalid-feedback">{error}</div>}
+
+            {error && (
+                <div className="invalid-feedback text-truncate">{error}</div>
+            )}
         </div>
     );
-};
-CheckBoxField.propTypes = {
+});
+
+CheckEdit.propTypes = {
     name: PropTypes.string,
     value: PropTypes.bool,
     onChange: PropTypes.func,
@@ -47,4 +47,6 @@ CheckBoxField.propTypes = {
     readOnly: PropTypes.bool
 };
 
-export default CheckBoxField;
+CheckEdit.displayName = "CheckEdit";
+
+export default CheckEdit;

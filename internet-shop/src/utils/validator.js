@@ -1,52 +1,98 @@
-export function validator(data, config) {
+export const isRequired = "isRequired";
+export const isEmail = "isEmail";
+export const isCapitalSymbol = "isCapitalSymbol";
+export const isContainDigit = "isContainDigit";
+export const isLessThan = "min";
+export const requiredIF = "requiredIF";
+
+export const validateMethods = {
+    isRequired,
+    isEmail,
+    isCapitalSymbol,
+    isContainDigit,
+    isLessThan,
+    requiredIF
+};
+export function validator(testData, config) {
     const errors = {};
-    function validate(testName, data, config) {
-        let statusValidate;
-        switch (testName) {
-            case "isRequired": {
-                if (typeof data === "boolean") {
-                    statusValidate = !data;
-                } else {
-                    statusValidate = data.trim() === "";
+    console.log("needValidate validateMethod config, data:", config, testData);
+
+    function validate(validateMethod, data, config) {
+        let needValidate;
+        switch (validateMethod) {
+            case requiredIF: {
+                if (Array.isArray(config.values)) {
+                    if (config.values.includes(testData[config.inField])) {
+                        if (typeof data === "boolean") {
+                            needValidate = !data;
+                        } else {
+                            needValidate = data.trim() === "";
+                        }
+                    }
                 }
+                console.log(
+                    "needValidate validateMethod config, data:",
+                    needValidate,
+                    validateMethod,
+                    config,
+                    data
+                );
                 break;
             }
-            case "isEmail": {
-                const emailRegExp = /^\S+@\S+\.\S+$/g;
-                statusValidate = !emailRegExp.test(data);
+            case isRequired: {
+                if (typeof data === "boolean") {
+                    needValidate = !data;
+                } else {
+                    needValidate = data.trim() === "";
+                    console.log(
+                        "needValidate validateMethod config, data:",
+                        needValidate,
+                        validateMethod,
+                        config,
+                        data
+                    );
+                }
+
                 break;
             }
-            case "isCapitalSymbol": {
+            case isEmail: {
+                const emailRegExp =
+                    /^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i;
+                needValidate = !emailRegExp.test(data);
+                break;
+            }
+            case isCapitalSymbol: {
                 const capitalRegExp = /[A-ZА-Я]+/g;
-                statusValidate = !capitalRegExp.test(data);
+                needValidate = !capitalRegExp.test(data);
                 break;
             }
-            case "isContainDigit": {
+            case isContainDigit: {
                 const digitRegExp = /\d+/g;
-                statusValidate = !digitRegExp.test(data);
+                needValidate = !digitRegExp.test(data);
                 break;
             }
-            case "min": {
-                statusValidate = data.length < config.value;
+            case isLessThan: {
+                needValidate = data.length < config.value;
                 break;
             }
             default:
                 break;
         }
-        if (statusValidate) return config.message;
+        if (needValidate) return config.message;
     }
 
-    for (const field in data) {
-        for (const testName in config[field]) {
+    for (const fieldName in testData) {
+        for (const validateMethod in config[fieldName]) {
             const error = validate(
-                testName,
-                data[field],
-                config[field][testName]
+                validateMethod,
+                testData[fieldName],
+                config[fieldName][validateMethod]
             );
-            if (error && !errors[field]) {
-                errors[field] = error;
+            if (error && !errors[fieldName]) {
+                errors[fieldName] = error;
             }
         }
     }
+
     return errors;
 }

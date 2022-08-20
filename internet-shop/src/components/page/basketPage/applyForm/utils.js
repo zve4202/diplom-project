@@ -1,4 +1,5 @@
 import defMap from "./data";
+
 export const valueOfName = (name) => {
     const value = defMap[name].value;
     if (typeof value === "string") {
@@ -22,3 +23,28 @@ export const createGroups = (data) => {
 
     return result;
 };
+
+export const validatorConfig = {};
+export const defaultData = {};
+
+export const createDefaults = () => {
+    if (Object.keys(defaultData).length > 0) return;
+    Object.keys(defMap).forEach((key) => {
+        defaultData[key] = valueOfName(key);
+        creatValidConfiguration(key);
+    });
+};
+
+function addValidatorConfig(name, data) {
+    if (validatorConfig[name]?.message) return;
+
+    validatorConfig[name] = { ...data };
+}
+
+function creatValidConfiguration(name) {
+    const item = defMap[name];
+
+    if (item.required) {
+        addValidatorConfig(name, item.required);
+    }
+}

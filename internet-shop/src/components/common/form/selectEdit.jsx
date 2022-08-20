@@ -1,7 +1,7 @@
 import React, { forwardRef } from "react";
 import PropTypes from "prop-types";
 
-const SelectField = forwardRef((props, ref) => {
+const SelectEdit = forwardRef((props, ref) => {
     const {
         label,
         value,
@@ -14,15 +14,16 @@ const SelectField = forwardRef((props, ref) => {
         ...rest
     } = props;
 
-    console.log(label, value, onChange, defaultOption);
+    console.log("options", options);
+
     const handleChange = ({ target }) => {
         if (readOnly) return;
         onChange({ name: target.name, value: target.value });
     };
     const getInputClasses = () => {
         return readOnly
-            ? "form-select form-select-sm bg-secondary bg-opacity-10"
-            : "form-select form-select-sm" + (error ? " is-invalid" : "");
+            ? "form-select bg-secondary bg-opacity-10"
+            : "form-select" + (error ? " is-invalid" : "");
     };
 
     const optionsArray =
@@ -31,8 +32,10 @@ const SelectField = forwardRef((props, ref) => {
             : options;
 
     return (
-        <div className={rest.className}>
-            <label htmlFor={name}>{label}</label>
+        <div key={rest.key} className={rest.className}>
+            <label htmlFor={name}>
+                <span className="text-truncate">{label}</span>
+            </label>
             <select
                 className={getInputClasses()}
                 id={name}
@@ -53,16 +56,18 @@ const SelectField = forwardRef((props, ref) => {
                         </option>
                     ))}
             </select>
-            {error && <div className="invalid-feedback">{error}</div>}
+            {error && (
+                <div className="invalid-feedback text-truncate">{error}</div>
+            )}
         </div>
     );
 });
 
-SelectField.defaultProps = {
+SelectEdit.defaultProps = {
     defaultOption: "Выбрать..."
 };
 
-SelectField.propTypes = {
+SelectEdit.propTypes = {
     defaultOption: PropTypes.string,
     label: PropTypes.string,
     value: PropTypes.string,
@@ -72,6 +77,6 @@ SelectField.propTypes = {
     name: PropTypes.string,
     readOnly: PropTypes.bool
 };
-SelectField.displayName = "TextField";
+SelectEdit.displayName = "TextEdit";
 
-export default SelectField;
+export default SelectEdit;

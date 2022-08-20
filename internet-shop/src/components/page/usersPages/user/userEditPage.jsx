@@ -3,9 +3,9 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 import { validator } from "../../../../utils/validator";
-import TextField from "../../../common/form/textField";
-import SelectField from "../../../common/form/selectField";
-import RadioField from "../../../common/form/radioField";
+import TextEdit from "../../../common/form/textEdit";
+import SelectEdit from "../../../common/form/selectEdit";
+import RadioEdit from "../../../common/form/radioEdit";
 
 import PasswordControl from "./passwordControl";
 import RoleControl from "./roleControl";
@@ -146,7 +146,7 @@ const UserEditPage = () => {
                     </div>
                     <div className="col">
                         <form onSubmit={handleSubmit}>
-                            <TextField
+                            <TextEdit
                                 label="Имя"
                                 name="name"
                                 value={data.name}
@@ -154,7 +154,7 @@ const UserEditPage = () => {
                                 error={errors.name}
                                 readOnly={!sameUser}
                             />
-                            <TextField
+                            <TextEdit
                                 label="Электронная почта"
                                 name="email"
                                 value={data.email}
@@ -167,7 +167,7 @@ const UserEditPage = () => {
                                 onShow={handleShowPassword}
                                 hideIf={isUpdated}
                             >
-                                <TextField
+                                <TextEdit
                                     label="Новый пароль"
                                     type="password"
                                     name="password"
@@ -177,7 +177,7 @@ const UserEditPage = () => {
                                 />
                             </PasswordControl>
                             <RoleControl userId={data._id}>
-                                <SelectField
+                                <SelectEdit
                                     label="Роль пользователя"
                                     defaultOption="Выбрать..."
                                     defaultValue={data.role}
@@ -192,7 +192,7 @@ const UserEditPage = () => {
                                     readOnly={sameUser}
                                 />
                             </RoleControl>
-                            <RadioField
+                            <RadioEdit
                                 options={[
                                     { name: "Мужчина", value: "male" },
                                     { name: "Женщина", value: "female" }

@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 import { updateSetting } from "../../../../store/setting";
-import SelectField from "./selectField";
+import SelectEdit from "./selectField";
 import { getLabels } from "../../../../store/labels";
 import { getFormats } from "../../../../store/formats";
 import { getOrigins } from "../../../../store/origin";
@@ -213,7 +213,7 @@ const ProductSearch = ({ name, onSearch }) => {
                 {/* <div className="row g-3 card card-body d-flex cen flex-nowrap"> */}
                 <div className="row g-2">
                     {Object.keys(selects).map((key, index) => (
-                        <SelectField
+                        <SelectEdit
                             key={index + 1}
                             name={key}
                             placeholder={selects[key].placeholder}

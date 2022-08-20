@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import history from "../../../utils/history";
 
-import TextField from "../../common/form/textField";
-import RadioField from "../../common/form/radioField";
+import TextEdit from "../../common/form/textEdit";
+import RadioEdit from "../../common/form/radioEdit";
 import { validator } from "../../../utils/validator";
 
 import { getAuth, getAuthError, signUp } from "../../../store/auth";
-import CheckBoxField from "../../common/form/checkBoxField";
+import CheckBoxEdit from "../../common/form/checkBoxEdit";
 import BackButton from "../../common/backButton";
 
 const defaultData = {
@@ -95,21 +95,21 @@ const RegisterForm = () => {
 
     return (
         <form onSubmit={handleSubmit}>
-            <TextField
+            <TextEdit
                 label="Имя пользователя"
                 name="name"
                 value={data.name}
                 onChange={handleChange}
                 error={errors.name}
             />
-            <TextField
+            <TextEdit
                 label="Электронная почта"
                 name="email"
                 value={data.email}
                 onChange={handleChange}
                 error={errors.email}
             />
-            <TextField
+            <TextEdit
                 label="Пароль"
                 type="password"
                 name="password"
@@ -117,7 +117,7 @@ const RegisterForm = () => {
                 onChange={handleChange}
                 error={errors.password}
             />
-            <RadioField
+            <RadioEdit
                 options={[
                     { name: "Мужчина", value: "male" },
                     { name: "Женщина", value: "female" }
@@ -127,13 +127,13 @@ const RegisterForm = () => {
                 onChange={handleChange}
                 label="Укажите ваш пол"
             />
-            <CheckBoxField
+            <CheckBoxEdit
                 value={data.stayOn}
                 onChange={handleChange}
                 name="stayOn"
             >
                 Оставаться в системе
-            </CheckBoxField>
+            </CheckBoxEdit>
 
             <div className="btn-group w-100 mx-auto" role="group">
                 <button
