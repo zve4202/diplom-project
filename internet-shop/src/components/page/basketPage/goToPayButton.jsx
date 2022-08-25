@@ -1,13 +1,15 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 import classNames from "classnames";
 
 import { yesNo } from "../../../dialogs/messageDialog";
 
-const GoToPayButton = ({ status, onAccept }) => {
+const GoToPayButton = ({ onAccept }) => {
     const { type } = useParams();
-
+    const data = useSelector((state) => state.basket.data);
+    const { status, deliveryInfo } = data;
     const question =
         "Вы действительно желаете отправить корзину на проверку, и перейти к оплате?";
 
@@ -20,6 +22,7 @@ const GoToPayButton = ({ status, onAccept }) => {
             ? "Перейти к офортлению"
             : "Перейти к оплате покупки";
 
+    const isDisabled = type !== "basket" && !deliveryInfo?.isValid;
     return (
         <div>
             <button
@@ -33,7 +36,7 @@ const GoToPayButton = ({ status, onAccept }) => {
                     }
                 }}
                 title={tooltip}
-                disabled={type === "check"}
+                disabled={isDisabled}
             >
                 <i
                     className={classNames({

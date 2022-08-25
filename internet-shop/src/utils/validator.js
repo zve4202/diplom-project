@@ -1,5 +1,8 @@
 export const isRequired = "isRequired";
 export const isEmail = "isEmail";
+export const isPhone = "isPhone";
+export const isIndex = "isIndex";
+export const isCardNumber = "isCardNumber";
 export const isCapitalSymbol = "isCapitalSymbol";
 export const isContainDigit = "isContainDigit";
 export const isLessThan = "min";
@@ -8,49 +11,41 @@ export const requiredIF = "requiredIF";
 export const validateMethods = {
     isRequired,
     isEmail,
+    isPhone,
+    isIndex,
+    isCardNumber,
     isCapitalSymbol,
     isContainDigit,
     isLessThan,
     requiredIF
 };
+
 export function validator(testData, config) {
     const errors = {};
-    console.log("needValidate validateMethod config, data:", config, testData);
 
     function validate(validateMethod, data, config) {
-        let needValidate;
+        let nextCheck = false;
+        let notValid;
         switch (validateMethod) {
             case requiredIF: {
                 if (Array.isArray(config.values)) {
                     if (config.values.includes(testData[config.inField])) {
                         if (typeof data === "boolean") {
-                            needValidate = !data;
+                            notValid = !data;
                         } else {
-                            needValidate = data.trim() === "";
+                            notValid = data.trim() === "";
                         }
+
+                        if (!notValid) nextCheck = true;
                     }
                 }
-                console.log(
-                    "needValidate validateMethod config, data:",
-                    needValidate,
-                    validateMethod,
-                    config,
-                    data
-                );
                 break;
             }
             case isRequired: {
                 if (typeof data === "boolean") {
-                    needValidate = !data;
+                    notValid = !data;
                 } else {
-                    needValidate = data.trim() === "";
-                    console.log(
-                        "needValidate validateMethod config, data:",
-                        needValidate,
-                        validateMethod,
-                        config,
-                        data
-                    );
+                    notValid = data.trim() === "";
                 }
 
                 break;
@@ -58,38 +53,64 @@ export function validator(testData, config) {
             case isEmail: {
                 const emailRegExp =
                     /^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i;
-                needValidate = !emailRegExp.test(data);
+                notValid = !emailRegExp.test(data);
+                break;
+            }
+            case isPhone: {
+                const phoneRegExp =
+                    /^[\+]?[0-9]{1,4} [(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g;
+                notValid = !phoneRegExp.test(data);
+                break;
+            }
+            case isCardNumber: {
+                const cardRegExp = /^[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}$/g;
+                notValid = !cardRegExp.test(data);
+                break;
+            }
+            case isIndex: {
+                const rusRegExp = /^\d{6}$/g;
+                const usRegExp = /^\d{5}[-\s]\d{4}$/g;
+                notValid = !(rusRegExp.test(data) || usRegExp.test(data));
                 break;
             }
             case isCapitalSymbol: {
                 const capitalRegExp = /[A-ZА-Я]+/g;
-                needValidate = !capitalRegExp.test(data);
+                notValid = !capitalRegExp.test(data);
                 break;
             }
             case isContainDigit: {
                 const digitRegExp = /\d+/g;
-                needValidate = !digitRegExp.test(data);
+                notValid = !digitRegExp.test(data);
                 break;
             }
             case isLessThan: {
-                needValidate = data.length < config.value;
+                notValid = data.length < config.value;
                 break;
             }
             default:
                 break;
         }
-        if (needValidate) return config.message;
+
+        return { error: notValid && config.message, nextCheck };
     }
 
     for (const fieldName in testData) {
-        for (const validateMethod in config[fieldName]) {
-            const error = validate(
-                validateMethod,
+        const nestedConfig = config[fieldName];
+
+        for (const method in nestedConfig) {
+            const { error, nextCheck } = validate(
+                method,
                 testData[fieldName],
-                config[fieldName][validateMethod]
+                nestedConfig[method]
             );
+
             if (error && !errors[fieldName]) {
                 errors[fieldName] = error;
+            }
+
+            if (method === requiredIF) {
+                if (nextCheck) continue;
+                else break;
             }
         }
     }

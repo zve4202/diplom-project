@@ -2,8 +2,10 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
-import { applyBasket } from "../../../../store/basket";
-import fieldsMap from "./data";
+import payments from "./payments";
+import deliveries from "./deliveries";
+import { updateDlvInfo } from "../../../../store/basket";
+import fieldsMap from "./applyMap";
 import {
     createDefaults,
     createGroups,
@@ -11,44 +13,97 @@ import {
     validatorConfig
 } from "./utils";
 import { validator } from "../../../../utils/validator";
-// import SelectEdit from "../../../common/form/SelectEdit";
-// import TextEdit from "../../../common/form/TextEdit";
-// import PlaceIdField from "./placeIdField";
-// import MemoEdit from "../../../common/form/MemoEdit";
 
 class ApplyForm extends Component {
     constructor(props) {
         super(props);
         createDefaults();
-        this.state = { data: { ...defaultData }, errors: {} };
+        const { deliveryInfo } = this.props.data;
+        this.state = {
+            deliveryInfo: { ...(deliveryInfo || defaultData) },
+            errors: {}
+        };
+
         this.applyRefs = React.createRef();
         this.handleCange = this.handleCange.bind(this);
     }
 
     componentDidMount() {
-        if (this.props.user) {
-            this.handleCange({ name: "persone", value: this.props.user.name });
+        const { persone } = this.state.deliveryInfo;
+        const { authUser } = this.props;
+        if (authUser && persone === "") {
+            this.handleCange({
+                name: "persone",
+                value: authUser.name
+            });
         }
+        this.validate();
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (this.props.user?.name !== prevProps.user?.name) {
-            if (this.props.user && !this.state.persone) {
+        const { persone } = this.state.deliveryInfo;
+        const { authUser } = this.props;
+        const currName = authUser?.name || "";
+        const prevName = prevProps.authUser?.name || "";
+        if (currName !== prevName) {
+            if (currName !== "" && persone === "") {
                 this.handleCange({
                     name: "persone",
-                    value: this.state.persone
+                    value: currName
                 });
             }
         }
-        if (this.state.data !== prevState.data) {
-            this.validate();
+
+        if (
+            JSON.stringify(this.state.deliveryInfo) !==
+            JSON.stringify(prevState.deliveryInfo)
+        ) {
+            const isValid = this.validate();
+
+            this.handleCange({
+                name: "isValid",
+                value: isValid
+            });
+
+            this.props.updateDlvInfo({
+                ...this.state.deliveryInfo,
+                isValid
+            });
         }
     }
 
     handleCange({ name, value }) {
+        const deliveryInfo = { ...this.state.deliveryInfo, [name]: value };
+        switch (name) {
+            case "delivery":
+                switch (value) {
+                    case deliveries.byRussianPost.value:
+                        deliveryInfo.payment = deliveries.byRussianPost.payment;
+                        break;
+                    case deliveries.byCompanySDEK.value:
+                        deliveryInfo.payment = deliveries.byCompanySDEK.payment;
+                        break;
+                    case deliveries.byCourier.value:
+                        deliveryInfo.payment = deliveries.byCourier.payment;
+                        break;
+                    case deliveries.onPickupPoint.value:
+                        deliveryInfo.payment = deliveries.onPickupPoint.payment;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+
+            case "payment":
+                break;
+
+            default:
+                break;
+        }
+
         this.setState((prevState) => ({
             ...prevState,
-            data: { ...prevState.data, [name]: value }
+            deliveryInfo
         }));
     }
 
@@ -60,17 +115,76 @@ class ApplyForm extends Component {
     }
 
     validate() {
-        const errors = validator(this.state.data, validatorConfig);
+        const errors = validator(this.state.deliveryInfo, validatorConfig);
         this.setErrors(errors);
         return Object.keys(errors).length === 0;
     }
 
-    getOptions(item) {
-        if (!item.src) return null;
-        return Object.keys(item.src).map((key, index) => ({
-            value: item.src[key].value,
-            label: item.src[key].label
-        }));
+    getOptions(name) {
+        switch (name) {
+            case "delivery": {
+                return Object.keys(deliveries).map((key, index) => ({
+                    value: deliveries[key].value,
+                    label: deliveries[key].label
+                }));
+            }
+            case "payment": {
+                const { delivery } = this.state.deliveryInfo;
+                return Object.keys(payments)
+                    .map((key, index) => ({
+                        value: payments[key].value,
+                        label: payments[key].label,
+                        visible: payments[key].visible
+                    }))
+                    .filter((p) => p.visible.includes(delivery));
+            }
+            default:
+                return null;
+        }
+    }
+
+    getReadOnly(name) {
+        switch (name) {
+            case "index": {
+                const { delivery } = this.state.deliveryInfo;
+                return [
+                    deliveries.byCourier.value,
+                    deliveries.onPickupPoint.value
+                ].includes(delivery);
+            }
+            case "address": {
+                const { delivery } = this.state.deliveryInfo;
+                return deliveries.onPickupPoint.value === delivery;
+            }
+            default:
+                return false;
+        }
+    }
+
+    getValue(name) {
+        switch (name) {
+            case "index": {
+                const { delivery } = this.state.deliveryInfo;
+                if (
+                    [
+                        deliveries.byCourier.value,
+                        deliveries.onPickupPoint.value
+                    ].includes(delivery)
+                ) {
+                    return "000000";
+                }
+                return this.state.deliveryInfo[name] || "";
+            }
+            case "address": {
+                const { delivery } = this.state.deliveryInfo;
+                if (deliveries.onPickupPoint.value === delivery) {
+                    return deliveries.onPickupPoint.label;
+                }
+                return this.state.deliveryInfo[name] || "";
+            }
+            default:
+                return this.state.deliveryInfo[name] || "";
+        }
     }
 
     createItem(name, gKey, classes) {
@@ -86,11 +200,12 @@ class ApplyForm extends Component {
             name,
             label,
             className: classname(item),
-            value: this.state.data[name] || "",
+            value: this.getValue(name),
             onChange: this.handleCange,
             placeholder: item.placeholder || label,
             error: this.state.errors[name],
-            options: this.getOptions(item)
+            options: this.getOptions(name),
+            readOnly: this.getReadOnly(name)
         };
 
         return item.component(attr);
@@ -135,9 +250,8 @@ class ApplyForm extends Component {
     }
 
     render() {
-        const { status, step } = this.props;
-        if (status === "basket") return null;
-        console.log("item", this.state);
+        const { step, data } = this.props;
+        if (data.status === "basket") return null;
 
         return (
             <div>
@@ -147,7 +261,7 @@ class ApplyForm extends Component {
                         Корзина на проверке...
                     </div>
                 )}
-                {status === "checked" && (
+                {data.status === "checked" && (
                     <div className="card col-md-8">
                         <div className="card-header">
                             <i className="bi bi-check2-square me-2" />
@@ -163,18 +277,23 @@ class ApplyForm extends Component {
 }
 
 ApplyForm.propTypes = {
-    status: PropTypes.string,
+    data: PropTypes.object,
     step: PropTypes.string.isRequired,
-    user: PropTypes.object
+    authUser: PropTypes.object,
+    updateDlvInfo: PropTypes.func
 };
 
-const mapStateToProps = (state) => ({
-    status: state.basket.data.status,
-    user: state.auth.currentUser
-});
+const mapStateToProps = (state) => {
+    const { authUser } = state.auth;
+    const { data } = state.basket;
+    return {
+        data,
+        authUser
+    };
+};
 
 const mapDispatchToProps = {
-    applyBasket
+    updateDlvInfo
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ApplyForm);

@@ -9,7 +9,7 @@ import {
 } from "../services/localStorage.service";
 
 const initialState = {
-    currentUser: null,
+    authUser: null,
     isAdmin: false,
     isLoading: true,
     error: null
@@ -23,9 +23,8 @@ const authSlice = createSlice({
             state = initialState;
         },
         resived(state, action) {
-            state.currentUser = action.payload;
-            state.isAdmin =
-                state.currentUser && state.currentUser.role === "admin";
+            state.authUser = action.payload;
+            state.isAdmin = state.authUser && state.authUser.role === "admin";
             state.isLoading = false;
         },
         requestFailed(state, action) {
@@ -33,7 +32,7 @@ const authSlice = createSlice({
             state.isLoading = false;
         },
         update(state, action) {
-            state.currentUser = action.payload;
+            state.authUser = action.payload;
         }
     }
 });
@@ -125,7 +124,7 @@ export const signOut = () => (dispatch, getState) => {
 };
 
 export const getAuth = () => (state) => ({
-    currentUser: state.auth.currentUser,
+    authUser: state.auth.authUser,
     isAdmin: state.auth.isAdmin
 });
 export const getAuthLoading = () => (state) => state.auth.isLoading;

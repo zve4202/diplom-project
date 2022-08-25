@@ -7,15 +7,6 @@ const TextEdit = forwardRef((props, ref) => {
 
     const [showPassword, setShowPassword] = useState(false);
 
-    // const nameCase = (value) => {
-    //     return value.replace(/\w\S*/g, function (txt) {
-    //         return (
-    //             Sttring(txt).charAt(0).toLocaleUpperCase() +
-    //             txt.substr(1).toLocaleLowerCase()
-    //         );
-    //     });
-    // };
-
     const handleChange = ({ target }) => {
         if (readOnly) return;
         // if (rest.nameCase) {
@@ -37,9 +28,7 @@ const TextEdit = forwardRef((props, ref) => {
         }
     };
 
-    const style = rest.nameCase
-        ? { "text-transform": "capitalize" }
-        : undefined;
+    const style = rest.nameCase ? { textTransform: "capitalize" } : undefined;
 
     return (
         <div key={rest.key} className={rest.className}>

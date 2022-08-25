@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 import { getAuth } from "../../../store/auth";
 
 const NavBar = () => {
-    const { currentUser, isAdmin } = useSelector(getAuth());
+    const { authUser, isAdmin } = useSelector(getAuth());
     return (
         <header className="sticky-top">
             <nav className="navbar card bg-light-gray">
@@ -31,7 +31,7 @@ const NavBar = () => {
                                 {appTitle}
                             </Link>
                         </li>
-                        {currentUser && isAdmin && (
+                        {authUser && isAdmin && (
                             <li className="nav-item">
                                 <MenuAdmin />
                             </li>

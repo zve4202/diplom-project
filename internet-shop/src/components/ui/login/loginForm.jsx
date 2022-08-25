@@ -25,14 +25,14 @@ const LoginForm = () => {
     const [errors, setErrors] = useState({});
     const [enterError, setEnterError] = useState(null);
     useEffect(() => {
-        // if (currentUser) {
+        // if (authUser) {
         //     history.push("/");
         // } else
         if (error) {
             setEnterError(error);
         }
     }, [
-        // currentUser,
+        // authUser,
         error
     ]);
 

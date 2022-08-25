@@ -4,24 +4,24 @@ import { Link } from "react-router-dom";
 import { getAuth } from "../../../store/auth";
 
 function MenuProfile() {
-    const { currentUser } = useSelector(getAuth());
+    const { authUser } = useSelector(getAuth());
     const [isOpen, setOpen] = useState(false);
     const toggleMenu = () => {
         setOpen((prevState) => !prevState);
     };
 
-    if (currentUser) {
+    if (authUser) {
         return (
             <div className="dropdown" onClick={toggleMenu}>
                 <div className="btn dropdown-toggle d-flex align-items-center nav-link">
-                    <div className="me-2">{currentUser.name}</div>
+                    <div className="me-2">{authUser.name}</div>
                     <i className="bi bi-person"></i>
                 </div>
                 <div
                     className={"w-100 dropdown-menu" + (isOpen ? " show" : "")}
                 >
                     <Link
-                        to={`/users/${currentUser._id}`}
+                        to={`/users/${authUser._id}`}
                         className="dropdown-item nav-link"
                     >
                         Профиль

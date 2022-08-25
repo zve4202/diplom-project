@@ -1,6 +1,8 @@
 const { Schema, model } = require("mongoose");
-const { createId } = require("../utils/db_utils");
 const ObjectIdType = Schema.Types.ObjectId;
+
+const { createId } = require("../utils/db_utils");
+// const { defaultData } = require("order-delivery-details/defaultData");
 
 const statuses = [
     "basket",
@@ -25,7 +27,20 @@ const schema = new Schema(
             type: String,
             enum: statuses,
             required: true,
-            default: "basket"
+            default: statuses[0]
+        },
+        deliveryInfo: {
+            type: Object,
+            default: {
+                placeId: "",
+                persone: "",
+                phone: "",
+                delivery: "",
+                payment: "",
+                index: "",
+                address: "",
+                note: ""
+            }
         }
     },
     { timestamps: true }

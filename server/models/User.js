@@ -1,8 +1,12 @@
+// module.exports = require("./User");
 const mongoose = require("mongoose");
 const aggregatePaginate = require("mongoose-aggregate-paginate-v2");
 const slug = require("mongoose-slug-generator");
 
+// const getPlaces = require("order-delivery-details/deliveryPlaces");
+
 mongoose.plugin(slug);
+
 const sexes = ["male", "female"];
 
 const schema = new mongoose.Schema(
@@ -14,10 +18,20 @@ const schema = new mongoose.Schema(
         sex: { type: String, enum: sexes, required: true },
         role: { type: String, ref: "Role" },
         image: { type: String },
-        property: { type: Object }
+        deliveryPlaces: {
+            type: Object,
+            default: { lastPlace: "", dataHistory: {} }
+        }
     },
     { timestamps: true }
 );
+
+// schema.pre("save", async function (next) {
+//     if (!this.deliveryPlaces) {
+//         this.deliveryPlaces = getPlaces();
+//     }
+//     next();
+// });
 
 schema.plugin(aggregatePaginate);
 

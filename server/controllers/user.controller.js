@@ -77,3 +77,28 @@ exports.update = async function (req, res, next) {
         return res.status(500).json({ status: 500, message: e.message });
     }
 };
+
+exports.info = async function (req, res, next) {
+    const { userId, deliveryInfo } = req.body;
+    const { placeId } = deliveryInfo;
+    try {
+        const user = await Model.findById(userId);
+        user.deliveryPlaces = {
+            lastPlace: placeId,
+            dataHistory: { [placeId]: { ...deliveryInfo } }
+        };
+        await user.save();
+        // const data = await Model.findByIdAndUpdate(userId, user, {
+        //     new: true
+        // });
+
+        return next();
+        // return res.status(200).json({
+        //     status: 200,
+        //     content: user,
+        //     message: DATA_UPDATED
+        // });
+    } catch (e) {
+        return res.status(500).json({ status: 500, message: e.message });
+    }
+};

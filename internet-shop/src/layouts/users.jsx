@@ -12,16 +12,16 @@ import { getAuth } from "../store/auth";
 const Users = () => {
     const params = useParams();
     const { userId, edit } = params;
-    const { currentUser, isAdmin } = useSelector(getAuth());
+    const { authUser, isAdmin } = useSelector(getAuth());
 
     return (
         <>
             {userId ? (
                 edit ? (
-                    userId === currentUser._id || isAdmin ? (
+                    userId === authUser._id || isAdmin ? (
                         <UserEditPage />
                     ) : (
-                        <Redirect to={`/users/${currentUser._id}/edit`} />
+                        <Redirect to={`/users/${authUser._id}/edit`} />
                     )
                 ) : (
                     <UserPage userId={userId} />

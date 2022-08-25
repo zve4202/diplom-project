@@ -18,8 +18,18 @@ const MaskEdit = forwardRef((props, ref) => {
     };
 
     const handleOnInput = (e) => {
-        if (type === "phone") {
-            onPhoneInput(e);
+        switch (type) {
+            case "phone":
+                onPhoneInput(e);
+                break;
+            case "index":
+                onIndexInput(e);
+                break;
+            case "card":
+                onCardInput(e);
+                break;
+            default:
+                break;
         }
     };
 
@@ -30,16 +40,22 @@ const MaskEdit = forwardRef((props, ref) => {
         const pasted = e.clipboardData || window.clipboardData;
         if (pasted) {
             const pastedText = pasted.getData("Text");
-            if (/\D/g.test(pastedText)) {
-                input.value = inputNumbersValue;
+            if (type === "phone") {
+                if (/\D/g.test(pastedText)) {
+                    input.value = inputNumbersValue;
+                }
+            } else {
+                input.value = pastedText;
             }
         }
     }
 
     const handleOnKeyDown = (e) => {
         const inputValue = e.target.value.replace(/\D/g, "");
+
         if (e.keyCode === 8 && inputValue.length === 1) {
             e.target.value = "";
+            handleChange(e);
         }
     };
 
@@ -122,6 +138,7 @@ function onPhoneInput(e) {
     }
 
     if (["7", "8", "9"].indexOf(inputNumbersValue[0]) > -1) {
+        /* ru */
         if (inputNumbersValue[0] === "9") {
             inputNumbersValue = "7" + inputNumbersValue;
         }
@@ -135,14 +152,80 @@ function onPhoneInput(e) {
         if (inputNumbersValue.length >= 5) {
             formattedInputValue += ") " + inputNumbersValue.substring(4, 7);
         }
+
         if (inputNumbersValue.length >= 8) {
-            formattedInputValue += "-" + inputNumbersValue.substring(7, 9);
-        }
-        if (inputNumbersValue.length >= 10) {
-            formattedInputValue += "-" + inputNumbersValue.substring(9, 11);
+            formattedInputValue += "-" + inputNumbersValue.substring(7, 11);
         }
     } else {
-        formattedInputValue = "+" + inputNumbersValue.substring(0, 16);
+        if (input.value[0] === "+") {
+            formattedInputValue = input.value;
+        } else {
+            formattedInputValue = "+" + input.value;
+        }
+        formattedInputValue = formattedInputValue.substring(0, 18);
     }
+    input.value = formattedInputValue;
+}
+
+function onIndexInput(e) {
+    const input = e.target;
+    console.log("onIndexInput", input);
+
+    const inputNumbersValue = getInputNumbersValue(input);
+    console.log("onIndexInput", inputNumbersValue);
+    const selectionStart = input.selectionStart;
+
+    if (!inputNumbersValue) {
+        return (input.value = "");
+    }
+
+    if (input.value.length !== selectionStart) {
+        // Editing in the middle of input, not last symbol
+        if (e.data && /\D/g.test(e.data)) {
+            // Attempt to input non-numeric symbol
+            input.value = inputNumbersValue;
+        }
+        return;
+    }
+    input.value = inputNumbersValue.substring(0, 6);
+}
+
+function onCardInput(e) {
+    const input = e.target;
+    const inputNumbersValue = getInputNumbersValue(input);
+    const selectionStart = input.selectionStart;
+    let formattedInputValue = "";
+
+    if (!inputNumbersValue) {
+        return (input.value = "");
+    }
+
+    if (input.value.length !== selectionStart) {
+        // Editing in the middle of input, not last symbol
+        if (e.data && /\D/g.test(e.data)) {
+            // Attempt to input non-numeric symbol
+            input.value = inputNumbersValue;
+        }
+        return;
+    }
+
+    if (inputNumbersValue.length > 1) {
+        formattedInputValue += inputNumbersValue.substring(0, 4);
+    }
+
+    if (inputNumbersValue.length >= 4) {
+        formattedInputValue += " " + inputNumbersValue.substring(3, 8);
+    }
+
+    if (inputNumbersValue.length >= 8) {
+        formattedInputValue += " " + inputNumbersValue.substring(7, 12);
+    }
+
+    if (inputNumbersValue.length >= 12) {
+        formattedInputValue += " " + inputNumbersValue.substring(11, 16);
+    }
+
+    formattedInputValue = formattedInputValue.substring(0, 19);
+
     input.value = formattedInputValue;
 }

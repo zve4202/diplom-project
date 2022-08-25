@@ -56,10 +56,10 @@ const { update, remove, resived, requested, requestFailed } = actions;
 
 export const loadReminders = () => async (dispatch, getState) => {
     const { lastFetch, docs } = getState().reminder;
-    const { currentUser } = getState().auth;
+    const { authUser } = getState().auth;
     const needRefresh = isOutdated(lastFetch) || docs.length === 0;
 
-    if (currentUser && needRefresh) {
+    if (authUser && needRefresh) {
         dispatch(requested());
         try {
             const { content } = await Service.fetchAll();
@@ -71,7 +71,7 @@ export const loadReminders = () => async (dispatch, getState) => {
 };
 
 export const updateReminder = (payload) => async (dispatch, getState) => {
-    if (!getState().auth.currentUser) {
+    if (!getState().auth.authUser) {
         history.push("/login");
         return;
     }
@@ -86,7 +86,7 @@ export const updateReminder = (payload) => async (dispatch, getState) => {
 };
 
 export const addReminder = (payload) => async (dispatch, getState) => {
-    if (!getState().auth.currentUser) {
+    if (!getState().auth.authUser) {
         history.push("/login");
         return;
     }

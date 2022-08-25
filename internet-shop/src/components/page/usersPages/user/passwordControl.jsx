@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { getAuth } from "../../../../store/auth";
 
 const PasswordControl = ({ userId, onShow, hideIf, children }) => {
-    const { currentUser } = useSelector(getAuth());
+    const { authUser } = useSelector(getAuth());
 
     const [change, setChange] = useState(false);
     const handleChange = () => {
@@ -16,7 +16,7 @@ const PasswordControl = ({ userId, onShow, hideIf, children }) => {
         if (hideIf) setChange(false);
     }, [hideIf]);
 
-    if (currentUser && currentUser._id === userId) {
+    if (authUser && authUser._id === userId) {
         if (change) {
             return (
                 <div className="row w-100">

@@ -68,9 +68,9 @@ const validatorConfig = {
 const UserEditPage = () => {
     const dispatch = useDispatch();
     const { userId } = useParams();
-    const { currentUser } = useSelector(getAuth());
+    const { authUser } = useSelector(getAuth());
     const user = useSelector(getUser(userId));
-    const sameUser = currentUser && currentUser._id === userId;
+    const sameUser = authUser && authUser._id === userId;
 
     const { isLoading, isUpdated, error } = useSelector(getUsersState());
 

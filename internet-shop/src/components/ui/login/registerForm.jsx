@@ -20,7 +20,7 @@ const defaultData = {
 };
 
 const RegisterForm = () => {
-    const { currentUser } = useSelector(getAuth());
+    const { authUser } = useSelector(getAuth());
     const error = useSelector(getAuthError());
     const dispatch = useDispatch();
 
@@ -28,14 +28,14 @@ const RegisterForm = () => {
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
-        if (currentUser) {
+        if (authUser) {
             history.push("/");
         } else if (error) {
             setErrors({
                 email: error
             });
         }
-    }, [currentUser, error]);
+    }, [authUser, error]);
 
     const handleChange = (target) => {
         setData((prevState) => ({

@@ -5,13 +5,13 @@ import { useSelector } from "react-redux";
 import { getAuth } from "../../store/auth";
 
 function ProtectedRoute({ component: Component, children, ...rest }) {
-    const { currentUser } = useSelector(getAuth());
+    const { authUser } = useSelector(getAuth());
 
     return (
         <Route
             {...rest}
             render={(props) => {
-                if (!currentUser) {
+                if (!authUser) {
                     return (
                         <Redirect
                             to={{

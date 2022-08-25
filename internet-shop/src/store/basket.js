@@ -7,6 +7,8 @@ const initialState = {
     data: {
         _id: null,
         userId: null,
+        status: null,
+        deliveryInfo: null,
         docs: [],
         products: [],
         totalQty: 0,
@@ -37,8 +39,10 @@ const basketSlice = createSlice({
             state.error = null;
         },
         resived(state, action) {
-            const totals = calcTotals(action.payload);
-            state.data = { ...action.payload, ...totals };
+            if (action.payload) {
+                const totals = calcTotals(action.payload);
+                state.data = { ...action.payload, ...totals };
+            }
             state.docsLoading = false;
         },
         requestedItems(state) {
@@ -87,6 +91,9 @@ const basketSlice = createSlice({
             state.data = { ...state.data, docs, products, ...totals };
             state.docsLoading = false;
         },
+        updateInfo(state, action) {
+            state.data.deliveryInfo = action.payload;
+        },
         requestFailed(state, action) {
             state.docsLoading = false;
             state.error = action.payload;
@@ -97,6 +104,7 @@ const basketSlice = createSlice({
 const { actions, reducer: basketReducer } = basketSlice;
 const {
     update,
+    updateInfo,
     remove,
     clear,
     resived,
@@ -114,6 +122,11 @@ export const loadBasket = () => async (dispatch) => {
     } catch (error) {
         dispatch(requestFailed(error.message));
     }
+};
+
+export const updateDlvInfo = (deliveryInfo) => async (dispatch, getState) => {
+    console.log("updateDlvInfo deliveryInfo", deliveryInfo);
+    dispatch(updateInfo(deliveryInfo));
 };
 
 export const loadBasketItems = (id) => async (dispatch, getState) => {
@@ -156,9 +169,9 @@ export const updateBasket = (payload) => async (dispatch, getState) => {
 };
 
 export const clearBasket = () => async (dispatch, getState) => {
-    dispatch(requested());
+    const { data } = getState().basket;
     try {
-        const { data } = getState().basket;
+        dispatch(requested());
         const { content } = await Service.deleteAll(data._id);
         dispatch(clear(content));
     } catch (error) {
@@ -168,8 +181,8 @@ export const clearBasket = () => async (dispatch, getState) => {
 
 export const checkBasket = () => async (dispatch, getState) => {
     const { data } = getState().basket;
-    const currentUser = getState().auth.currentUser;
-    if (!currentUser) {
+    const authUser = getState().auth.authUser;
+    if (!authUser) {
         history.push({
             pathname: "/login",
             state: {
@@ -180,9 +193,8 @@ export const checkBasket = () => async (dispatch, getState) => {
         });
         return;
     }
-    const userdata = { ...data, userId: currentUser };
 
-    dispatch(requested());
+    const userdata = { ...data, userId: authUser._id };
     try {
         dispatch(requested());
         const { content } = await Service.check(userdata);
@@ -194,8 +206,8 @@ export const checkBasket = () => async (dispatch, getState) => {
 
 export const applyBasket = () => async (dispatch, getState) => {
     const { data } = getState().basket;
-    const currentUser = getState().auth.currentUser;
-    if (!currentUser) {
+    const authUser = getState().auth.authUser;
+    if (!authUser) {
         history.push({
             pathname: "/login",
             state: {
@@ -206,9 +218,8 @@ export const applyBasket = () => async (dispatch, getState) => {
         });
         return;
     }
-    const userdata = { ...data, userId: currentUser };
+    const userdata = { ...data, userId: authUser._id };
 
-    dispatch(requested());
     try {
         dispatch(requested());
         const { content } = await Service.apply(userdata);

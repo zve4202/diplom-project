@@ -14,12 +14,11 @@ const SelectEdit = forwardRef((props, ref) => {
         ...rest
     } = props;
 
-    console.log("options", options);
-
     const handleChange = ({ target }) => {
         if (readOnly) return;
         onChange({ name: target.name, value: target.value });
     };
+
     const getInputClasses = () => {
         return readOnly
             ? "form-select bg-secondary bg-opacity-10"

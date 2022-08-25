@@ -156,32 +156,6 @@ exports.deleteAll = async function (req, res, next) {
     }
 };
 
-exports.apply = async function (req, res, next) {
-    const { id } = req.params;
-    try {
-        // TODO
-        // const { docs } = req.body;
-        // const totals = { totalQty: 0, totalPrice: 0 };
-        // docs.forEach((item) => {
-        //     const { qty, price } = item;
-        //     totals.totalQty += qty;
-        //     totals.totalPrice += qty * price;
-        // });
-        // const data = await order.findByIdAndUpdate(
-        //     id,
-        //     { ...req.body, ...totals },
-        //     { new: true }
-        // );
-        return res.status(200).json({
-            status: 200,
-            content: null,
-            message: DATA_UPDATED
-        });
-    } catch (e) {
-        return res.status(500).json({ status: 500, message: e.message });
-    }
-};
-
 exports.check = async function (req, res, next) {
     try {
         const { _id, docs } = req.body;
@@ -225,6 +199,44 @@ exports.check = async function (req, res, next) {
         return res.status(200).json({
             status: 200,
             content: data,
+            message: DATA_UPDATED
+        });
+    } catch (e) {
+        return res.status(500).json({ status: 500, message: e.message });
+    }
+};
+
+exports.info = async function (req, res, next) {
+    const { _id } = req.body;
+    try {
+        const data = await order.findByIdAndUpdate(
+            _id,
+            { ...req.body },
+            { new: true }
+        );
+
+        return res.status(200).json({
+            status: 200,
+            content: null,
+            message: DATA_UPDATED
+        });
+    } catch (e) {
+        return res.status(500).json({ status: 500, message: e.message });
+    }
+};
+
+exports.apply = async function (req, res, next) {
+    const { id } = req.params;
+    try {
+        // TODO
+        // const data = await order.findByIdAndUpdate(
+        //     id,
+        //     { ...req.body, ...totals },
+        //     { new: true }
+        // );
+        return res.status(200).json({
+            status: 200,
+            content: null,
             message: DATA_UPDATED
         });
     } catch (e) {

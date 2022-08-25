@@ -1,23 +1,27 @@
-import payments from "./payments";
+export const byRussianPost = {
+    value: "Russian Post",
+    label: "Посылка через (ПОЧТА РОССИИ)",
+    payment: "Pay On Delivery"
+};
+export const byCompanySDEK = {
+    value: "Company SDEK",
+    label: "Посылка через (СДЭК)",
+    payment: "Sberbank Receipt"
+};
+export const byCourier = {
+    value: "By Courier",
+    label: "Курьером по городу",
+    payment: "Cash In Hand"
+};
+export const onPickupPoint = {
+    value: "Pickup Point",
+    label: "Пункт самовывоза",
+    payment: "Cash In Hand"
+};
+
 export default {
-    russianPost: {
-        value: "Russian Post",
-        label: "Посылка через (ПОЧТА РОССИИ)",
-        payment: payments.payOnDelivery
-    },
-    companySDEK: {
-        value: "Company SDEK",
-        label: "Посылка через (СДЭК)",
-        payment: payments.sberbankReceipt
-    },
-    byCourier: {
-        value: "By Courier",
-        label: "Курьером по городу",
-        payment: payments.cashInHand
-    },
-    pickupPoint: {
-        value: "Pickup Point",
-        label: "Пункт самовывоза",
-        payment: payments.cashInHand
-    }
+    byRussianPost,
+    byCompanySDEK,
+    byCourier,
+    onPickupPoint
 };

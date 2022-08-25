@@ -3,9 +3,9 @@ import { useSelector } from "react-redux";
 import { getAuth } from "../../../../store/auth";
 
 const RoleControl = ({ userId, children }) => {
-    const { currentUser, isAdmin } = useSelector(getAuth());
+    const { authUser, isAdmin } = useSelector(getAuth());
 
-    if (isAdmin && currentUser._id !== userId) {
+    if (isAdmin && authUser._id !== userId) {
         return children;
     }
     return null;
