@@ -7,10 +7,10 @@ const { createId } = require("../utils/db_utils");
 const statuses = [
     "basket",
     "checked",
+    "needpay",
     "new",
-    "ordered",
-    "pending",
     "assembled",
+    "pendingPayment",
     "sent",
     "delivered",
     "cancelled",
@@ -39,9 +39,12 @@ const schema = new Schema(
                 payment: "",
                 index: "",
                 address: "",
-                note: ""
+                note: "",
+                isValid: false,
+                sumOfPay: 0
             }
-        }
+        },
+        checkedAt: { type: Date }
     },
     { timestamps: true }
 );
@@ -49,6 +52,9 @@ const schema = new Schema(
 schema.pre("save", async function (next) {
     if (!this._id) {
         this._id = await createId("order");
+    }
+    if (this.status === "checked" && this.checkedAt === null) {
+        this.checkedAt = new Date();
     }
     next();
 });

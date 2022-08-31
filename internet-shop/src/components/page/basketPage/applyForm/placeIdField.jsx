@@ -47,6 +47,7 @@ const PlaceIdField = forwardRef((props, ref) => {
                     readOnly={readOnly}
                     placeholder={rest.placeholder || label}
                     title={rest.placeholder || label}
+                    style={{ textTransform: "capitalize" }}
                 />
             )}
 

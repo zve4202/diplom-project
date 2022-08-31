@@ -125,7 +125,6 @@ export const loadBasket = () => async (dispatch) => {
 };
 
 export const updateDlvInfo = (deliveryInfo) => async (dispatch, getState) => {
-    console.log("updateDlvInfo deliveryInfo", deliveryInfo);
     dispatch(updateInfo(deliveryInfo));
 };
 
@@ -179,6 +178,30 @@ export const clearBasket = () => async (dispatch, getState) => {
     }
 };
 
+export const removeBasket = (id) => async (dispatch, getState) => {
+    dispatch(requested());
+    try {
+        const { docs } = getState().basket.data;
+        const doc = docs.find((item) => item.product === id);
+        dispatch(remove(id));
+        await Service.delete(doc._id);
+    } catch (error) {
+        dispatch(requestFailed(error.message));
+    }
+};
+
+export const removeBasketItem = (id) => async (dispatch, getState) => {
+    dispatch(requested());
+    try {
+        const { docs } = getState().basket.data;
+        const doc = docs.find((item) => item.product === id);
+        dispatch(remove(id));
+        await Service.delete(doc._id);
+    } catch (error) {
+        dispatch(requestFailed(error.message));
+    }
+};
+
 export const checkBasket = () => async (dispatch, getState) => {
     const { data } = getState().basket;
     const authUser = getState().auth.authUser;
@@ -194,10 +217,10 @@ export const checkBasket = () => async (dispatch, getState) => {
         return;
     }
 
-    const userdata = { ...data, userId: authUser._id };
+    const basketData = { ...data, userId: authUser._id };
     try {
         dispatch(requested());
-        const { content } = await Service.check(userdata);
+        const { content } = await Service.check(basketData);
         dispatch(resived(content));
     } catch (error) {
         dispatch(requestFailed(error.message));
@@ -218,36 +241,40 @@ export const applyBasket = () => async (dispatch, getState) => {
         });
         return;
     }
-    const userdata = { ...data, userId: authUser._id };
+    const basketData = { ...data, userId: authUser._id };
+    console.log("applyBasket", basketData);
 
     try {
         dispatch(requested());
-        const { content } = await Service.apply(userdata);
+        const { content } = await Service.apply(basketData);
         dispatch(resived(content));
     } catch (error) {
         dispatch(requestFailed(error.message));
     }
 };
 
-export const removeBasket = (id) => async (dispatch, getState) => {
-    dispatch(requested());
-    try {
-        const { docs } = getState().basket.data;
-        const doc = docs.find((item) => item.product === id);
-        dispatch(remove(id));
-        await Service.delete(doc._id);
-    } catch (error) {
-        dispatch(requestFailed(error.message));
+export const payOrder = (sumOfPay) => async (dispatch, getState) => {
+    const authUser = getState().auth.authUser;
+    if (!authUser) {
+        history.push({
+            pathname: "/login",
+            state: {
+                from: {
+                    pathname: "/basket/topay"
+                }
+            }
+        });
+        return;
     }
-};
+    const { data } = getState().basket;
+    const deliveryInfo = { ...data.deliveryInfo, sumOfPay };
 
-export const removeBasketItem = (id) => async (dispatch, getState) => {
-    dispatch(requested());
+    const basketData = { ...data, deliveryInfo, userId: authUser._id };
+
     try {
-        const { docs } = getState().basket.data;
-        const doc = docs.find((item) => item.product === id);
-        dispatch(remove(id));
-        await Service.delete(doc._id);
+        dispatch(requested());
+        const { content } = await Service.topay(basketData);
+        dispatch(resived(content));
     } catch (error) {
         dispatch(requestFailed(error.message));
     }

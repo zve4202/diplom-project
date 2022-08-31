@@ -1,8 +1,10 @@
 export const isRequired = "isRequired";
 export const isEmail = "isEmail";
 export const isPhone = "isPhone";
-export const isIndex = "isIndex";
 export const isCardNumber = "isCardNumber";
+export const isMonthYear = "isMonthYear";
+export const isCVC = "isCVC";
+export const isIndex = "isIndex";
 export const isCapitalSymbol = "isCapitalSymbol";
 export const isContainDigit = "isContainDigit";
 export const isLessThan = "min";
@@ -12,8 +14,10 @@ export const validateMethods = {
     isRequired,
     isEmail,
     isPhone,
-    isIndex,
     isCardNumber,
+    isMonthYear,
+    isCVC,
+    isIndex,
     isCapitalSymbol,
     isContainDigit,
     isLessThan,
@@ -51,20 +55,30 @@ export function validator(testData, config) {
                 break;
             }
             case isEmail: {
-                const emailRegExp =
+                const regExp =
                     /^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i;
-                notValid = !emailRegExp.test(data);
+                notValid = !regExp.test(data);
                 break;
             }
             case isPhone: {
-                const phoneRegExp =
+                const regExp =
                     /^[\+]?[0-9]{1,4} [(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g;
-                notValid = !phoneRegExp.test(data);
+                notValid = !regExp.test(data);
                 break;
             }
             case isCardNumber: {
-                const cardRegExp = /^[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}$/g;
-                notValid = !cardRegExp.test(data);
+                const regExp = /^[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}$/g;
+                notValid = !regExp.test(data);
+                break;
+            }
+            case isMonthYear: {
+                const regExp = /^[0-9]{3}$/g;
+                notValid = !regExp.test(data);
+                break;
+            }
+            case isCVC: {
+                const regExp = /^[0-9]{2}\/[0-9]{2}$/g;
+                notValid = !regExp.test(data);
                 break;
             }
             case isIndex: {

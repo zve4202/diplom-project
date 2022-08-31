@@ -13,6 +13,7 @@ import {
     validatorConfig
 } from "./utils";
 import { validator } from "../../../../utils/validator";
+import CheckAlerter from "./alerter";
 
 class ApplyForm extends Component {
     constructor(props) {
@@ -38,6 +39,10 @@ class ApplyForm extends Component {
             });
         }
         this.validate();
+    }
+
+    componentWillUnmount() {
+        // clearInterval(this.timerId);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -171,7 +176,7 @@ class ApplyForm extends Component {
                         deliveries.onPickupPoint.value
                     ].includes(delivery)
                 ) {
-                    return "000000";
+                    return "-";
                 }
                 return this.state.deliveryInfo[name] || "";
             }
@@ -233,7 +238,7 @@ class ApplyForm extends Component {
         }
     }
 
-    createItems() {
+    createControls() {
         const groups = createGroups(fieldsMap);
         const gKey = {
             key: 0
@@ -254,21 +259,25 @@ class ApplyForm extends Component {
         if (data.status === "basket") return null;
 
         return (
-            <div>
-                {step === "check" && (
+            <div className="px-0">
+                {step === "check" && data.status === "basket" && (
                     <div className="form-control bg-success bg-opacity-10 text-md-center text-success">
                         <span className="spinner-border spinner-border-sm  me-2" />
                         Корзина на проверке...
                     </div>
                 )}
                 {data.status === "checked" && (
-                    <div className="card col-md-8">
+                    <div>
                         <div className="card-header">
                             <i className="bi bi-check2-square me-2" />
-                            Корзина проверена. Можно приступать к оформлению
-                            заказа.
+                            Корзина проверена.
                         </div>
-                        <div className="card-body">{this.createItems()}</div>
+                        <div className="col-md-8">
+                            <div className="card-body px-0">
+                                <CheckAlerter data={data.checkedAt} />
+                                {this.createControls()}
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>

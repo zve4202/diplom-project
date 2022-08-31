@@ -26,8 +26,8 @@ const basketService = {
         const { data } = await httpService.put(endpoint + "check/", content);
         return data;
     },
-    dlvInfo: async (content) => {
-        const { data } = await httpService.put(endpoint + "info/", content);
+    topay: async (content) => {
+        const { data } = await httpService.put(endpoint + "topay/", content);
         return data;
     },
     apply: async (content) => {

@@ -13,7 +13,7 @@ import ClearBasketButton from "./clearBasketButton";
 import GoToPayButton from "./goToPayButton";
 import BasketTotals from "./basketTotals";
 
-const BasketSidebar = ({ menu, onCheckAndPay }) => {
+const BasketSidebar = ({ menu, step, onCheckAndPay }) => {
     const basket = useSelector(getBasket());
     const dispatch = useDispatch();
 
@@ -60,10 +60,7 @@ const BasketSidebar = ({ menu, onCheckAndPay }) => {
                         status={basket.status}
                         onAccept={handleClearBasket}
                     />
-                    <GoToPayButton
-                        status={basket.status}
-                        onAccept={onCheckAndPay}
-                    />
+                    <GoToPayButton step={step} onAccept={onCheckAndPay} />
                 </div>
             )}
         </SideBarWrapper>
@@ -71,6 +68,7 @@ const BasketSidebar = ({ menu, onCheckAndPay }) => {
 };
 
 BasketSidebar.propTypes = {
+    step: PropTypes.string.isRequired,
     menu: PropTypes.object.isRequired,
     onCheckAndPay: PropTypes.func.isRequired
 };

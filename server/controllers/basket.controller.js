@@ -26,7 +26,7 @@ const agg = (match) => [
 
 exports.get = async function (req, res, next) {
     const { ip } = req;
-    const status = [statuses[0], statuses[1]];
+    const status = [statuses[0], statuses[1], statuses[2]];
     const match = req.match
         ? req.match
         : { userIp: ip, status: { $in: status } };
@@ -193,7 +193,8 @@ exports.check = async function (req, res, next) {
 
         const data = await order.findByIdAndUpdate(_id, {
             ...req.body,
-            status: statuses[1]
+            status: statuses[1],
+            checkedAt: new Date()
         });
 
         return res.status(200).json({
@@ -206,18 +207,20 @@ exports.check = async function (req, res, next) {
     }
 };
 
-exports.info = async function (req, res, next) {
-    const { _id } = req.body;
+exports.apply = async function (req, res, next) {
     try {
-        const data = await order.findByIdAndUpdate(
-            _id,
-            { ...req.body },
-            { new: true }
-        );
+        const { _id, deliveryInfo } = req.body;
+        const { payment } = deliveryInfo;
+        const status = payment === "Acquiring" ? statuses[2] : statuses[3];
+
+        const data = await order.findByIdAndUpdate(_id, {
+            ...req.body,
+            status
+        });
 
         return res.status(200).json({
             status: 200,
-            content: null,
+            content: data,
             message: DATA_UPDATED
         });
     } catch (e) {
@@ -225,18 +228,20 @@ exports.info = async function (req, res, next) {
     }
 };
 
-exports.apply = async function (req, res, next) {
-    const { id } = req.params;
+exports.setPay = async function (req, res, next) {
     try {
-        // TODO
-        // const data = await order.findByIdAndUpdate(
-        //     id,
-        //     { ...req.body, ...totals },
-        //     { new: true }
-        // );
+        const { _id, deliveryInfo } = req.body;
+        const status = statuses[3];
+
+        const data = await order.findByIdAndUpdate(_id, {
+            ...req.body,
+            deliveryInfo,
+            status
+        });
+
         return res.status(200).json({
             status: 200,
-            content: null,
+            content: data,
             message: DATA_UPDATED
         });
     } catch (e) {

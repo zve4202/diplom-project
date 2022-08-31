@@ -28,6 +28,13 @@ const MaskEdit = forwardRef((props, ref) => {
             case "card":
                 onCardInput(e);
                 break;
+            case "monYear":
+                onMonYearInput(e);
+                break;
+            case "cvc":
+                onCvcInput(e);
+                break;
+
             default:
                 break;
         }
@@ -40,7 +47,7 @@ const MaskEdit = forwardRef((props, ref) => {
         const pasted = e.clipboardData || window.clipboardData;
         if (pasted) {
             const pastedText = pasted.getData("Text");
-            if (type === "phone") {
+            if (["phone", "index", "card"].includes(type)) {
                 if (/\D/g.test(pastedText)) {
                     input.value = inputNumbersValue;
                 }
@@ -51,11 +58,12 @@ const MaskEdit = forwardRef((props, ref) => {
     }
 
     const handleOnKeyDown = (e) => {
-        const inputValue = e.target.value.replace(/\D/g, "");
-
-        if (e.keyCode === 8 && inputValue.length === 1) {
-            e.target.value = "";
-            handleChange(e);
+        if (e.keyCode === 8) {
+            let inputValue = e.target.value.replace(/\D/g, "");
+            if (inputValue.length > 0) {
+                inputValue = inputValue.substring(0, inputValue.length);
+                e.target.value = inputValue;
+            }
         }
     };
 
@@ -66,7 +74,7 @@ const MaskEdit = forwardRef((props, ref) => {
             </label>
             <div className="input-group has-validation">
                 <input
-                    type="tel"
+                    type={type === "cvc" ? "password" : "tel"}
                     inputMode="numeric"
                     autoComplete="cc-number"
                     id={name}
@@ -79,7 +87,7 @@ const MaskEdit = forwardRef((props, ref) => {
                     className={getInputClasses()}
                     readOnly={readOnly}
                     placeholder={rest.placeholder || label}
-                    title={rest.placeholder || label}
+                    title={rest.title || rest.placeholder || label}
                     ref={ref}
                 />
 
@@ -209,23 +217,98 @@ function onCardInput(e) {
         return;
     }
 
-    if (inputNumbersValue.length > 1) {
+    if (inputNumbersValue.length >= 1) {
         formattedInputValue += inputNumbersValue.substring(0, 4);
     }
 
     if (inputNumbersValue.length >= 4) {
-        formattedInputValue += " " + inputNumbersValue.substring(3, 8);
+        formattedInputValue += " " + inputNumbersValue.substring(4, 8);
     }
 
     if (inputNumbersValue.length >= 8) {
-        formattedInputValue += " " + inputNumbersValue.substring(7, 12);
+        formattedInputValue += " " + inputNumbersValue.substring(8, 12);
     }
 
     if (inputNumbersValue.length >= 12) {
-        formattedInputValue += " " + inputNumbersValue.substring(11, 16);
+        formattedInputValue += " " + inputNumbersValue.substring(12, 16);
     }
 
     formattedInputValue = formattedInputValue.substring(0, 19);
+
+    input.value = formattedInputValue;
+}
+function onCvcInput(e) {
+    const input = e.target;
+    const inputNumbersValue = getInputNumbersValue(input);
+    const selectionStart = input.selectionStart;
+    let formattedInputValue = "";
+
+    if (!inputNumbersValue) {
+        return (input.value = "");
+    }
+
+    if (input.value.length !== selectionStart) {
+        // Editing in the middle of input, not last symbol
+        if (e.data && /\D/g.test(e.data)) {
+            // Attempt to input non-numeric symbol
+            input.value = inputNumbersValue;
+        }
+        return;
+    }
+
+    formattedInputValue = inputNumbersValue.substring(0, 3);
+
+    input.value = formattedInputValue;
+}
+
+function onMonYearInput(e) {
+    const input = e.target;
+    const inputNumbersValue = getInputNumbersValue(input);
+    const selectionStart = input.selectionStart;
+    let formattedInputValue = "";
+
+    if (!inputNumbersValue) {
+        return (input.value = "");
+    }
+
+    if (input.value.length !== selectionStart) {
+        // Editing in the middle of input, not last symbol
+        if (e.data && /\D/g.test(e.data)) {
+            // Attempt to input non-numeric symbol
+            input.value = inputNumbersValue;
+        }
+        return;
+    }
+
+    if (inputNumbersValue.length >= 1) {
+        if (inputNumbersValue.length === 2) {
+            let month = Math.max(
+                1,
+                Math.min(12, Number.parseInt(inputNumbersValue))
+            ).toString();
+
+            if (month.length === 1) {
+                month = "0" + month;
+            }
+            formattedInputValue += month;
+        } else {
+            formattedInputValue += inputNumbersValue.substring(0, 2);
+        }
+    }
+
+    if (inputNumbersValue.length > 2) {
+        if (inputNumbersValue.length === 4) {
+            const currYear = new Date().getFullYear() - 2000;
+            const year = Math.max(
+                currYear,
+                Math.min(99, Number.parseInt(inputNumbersValue.substring(2, 4)))
+            ).toString();
+            formattedInputValue += "/" + year;
+        }
+        formattedInputValue += "/" + inputNumbersValue.substring(2, 4);
+    }
+
+    formattedInputValue = formattedInputValue.substring(0, 5);
 
     input.value = formattedInputValue;
 }
