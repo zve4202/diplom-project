@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
 
 import BasketSidebar from "./basketSidebar";
 import BasketTable from "./table/basketTable";
@@ -16,26 +15,25 @@ import ContentWrapper from "../../common/wrappers/content";
 import ApplyForm from "./applyForm/applyForm";
 
 const BasketPage = () => {
-    let { step } = useParams();
+    let step;
     const dispatch = useDispatch();
 
     const { productsLoading, data } = useSelector((state) => state.basket);
     const { products, _id } = data;
 
-    if (!step) {
-        switch (data.status) {
-            case "basket":
-                step = "show";
-                break;
-            case "checked":
-                step = "check";
-                break;
-            case "needpay":
-                step = "needpay";
-                break;
-            default:
-                break;
-        }
+    switch (data.status) {
+        case "basket":
+            step = "show";
+            break;
+        case "checked":
+            step = "check";
+            break;
+        case "needpay":
+            step = "needpay";
+            break;
+        default:
+            step = "undoCheck";
+            break;
     }
 
     const [stepName, setStepName] = useState(step);
@@ -57,7 +55,6 @@ const BasketPage = () => {
             dispatch(checkBasket());
         }
         if (data.status === "checked" && stepName === "apply") {
-            console.log("useEffect", "case checked && stepName === apply");
             dispatch(applyBasket());
         }
         if (data.status === "needpay" && stepName === "topay") {
@@ -65,20 +62,8 @@ const BasketPage = () => {
         }
     }, [stepName, data.status]);
 
-    const handleCheckAndPay = () => {
-        switch (data.status) {
-            case "basket":
-                setStepName("check");
-                break;
-            case "checked":
-                setStepName("apply");
-                break;
-            case "needpay":
-                setStepName("topay");
-                break;
-            default:
-                break;
-        }
+    const handleCheckAndPay = (todo) => {
+        setStepName(todo);
     };
 
     return (

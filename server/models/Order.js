@@ -60,14 +60,13 @@ schema.pre("save", async function (next) {
     next();
 });
 
-const order = model("Order", schema);
+const Order = model("Order", schema);
 
-order.collection.createIndex({
+Order.collection.createIndex({
     userIp: 1,
     status: 1
 });
-module.exports = order;
 module.exports = {
-    order,
+    Order,
     statuses
 };

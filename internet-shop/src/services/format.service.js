@@ -1,7 +1,7 @@
 import httpService from "./http.service";
 const endpoint = "format/";
 
-const formatService = {
+const FormatService = {
     update: async (id, content) => {
         const { data } = await httpService.put(endpoint + id, content);
         return data;
@@ -23,4 +23,4 @@ const formatService = {
         return data;
     }
 };
-export default formatService;
+export default FormatService;

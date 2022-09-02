@@ -1,5 +1,5 @@
 const { DATA_RECEIVED } = require("../config/config");
-const { product_m } = require("../models");
+const { Product_m } = require("../models");
 const Category = require("../models/Category");
 
 const agg = [
@@ -55,7 +55,7 @@ exports.getAll = async function (req, res, next) {
     const page = req.params.page ? req.params.page : 1;
     const limit = req.params.limit ? req.params.limit : 10;
     try {
-        const data = await product_m.aggregate(agg);
+        const data = await Product_m.aggregate(agg);
         return res.status(200).json({
             status: 200,
             content: data,

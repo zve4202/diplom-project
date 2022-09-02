@@ -4,13 +4,13 @@ import { useSelector, useDispatch } from "react-redux";
 
 import history from "../../../utils/history";
 
-import { getBasket, clearBasket } from "../../../store/basket";
+import { getBasket, clearBasket, disassemble } from "../../../store/basket";
 import SideBarWrapper from "../../common/wrappers/sideBar";
 import BackButton from "../../common/backButton";
 // import { yesNo } from "../../../dialogs/messageDialog";
 // import { names } from "./menu";
-import ClearBasketButton from "./clearBasketButton";
-import GoToPayButton from "./goToPayButton";
+import UndoBasketButton from "./undoBasketButton";
+import ApplyBasketButton from "./applyBasketButton";
 import BasketTotals from "./basketTotals";
 import PayForm from "./payForm/payForm";
 
@@ -20,19 +20,24 @@ const BasketSidebar = ({ menu, step, onCheckAndPay }) => {
 
     // const nf = Intl.NumberFormat();
 
-    const handleClearBasket = () => {
-        dispatch(clearBasket());
-        setTimeout(() => {
-            if (history.location.pathname.includes("basket")) {
-                history.push("/");
-            }
-        }, [3000]);
+    const handleUndoBasket = (todo) => {
+        if (todo === "clear") {
+            dispatch(clearBasket());
+            setTimeout(() => {
+                if (history.location.pathname.includes("basket")) {
+                    history.push("/");
+                }
+            }, [3000]);
+        } else {
+            dispatch(disassemble());
+            onCheckAndPay("undo");
+        }
     };
 
     // const onItemSelect = (item) => {
     //     switch (item.path) {
     //         case names.clear:
-    //             yesNo("Вы действительно желаете очистить вашу корзину?", handleClearBasket);
+    //             yesNo("Вы действительно желаете очистить вашу корзину?", handleUndoBasket);
     //             break;
     //         case names.goto:
     // yesNo(
@@ -57,11 +62,11 @@ const BasketSidebar = ({ menu, step, onCheckAndPay }) => {
             {basket.totalQty > 0 && (
                 <div>
                     <BasketTotals basket={basket} />
-                    <ClearBasketButton
+                    <UndoBasketButton
                         status={basket.status}
-                        onAccept={handleClearBasket}
+                        onAccept={handleUndoBasket}
                     />
-                    <GoToPayButton step={step} onAccept={onCheckAndPay} />
+                    <ApplyBasketButton step={step} onAccept={onCheckAndPay} />
                     <PayForm className="mt-3" />
                 </div>
             )}

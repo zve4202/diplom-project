@@ -1,7 +1,7 @@
 import httpService from "./http.service";
 const roleEndpoint = "role/";
 
-const roleService = {
+const RoleService = {
     update: async (id, content) => {
         const { data } = await httpService.put(roleEndpoint + id, content);
         return data;
@@ -23,4 +23,4 @@ const roleService = {
         return data;
     }
 };
-export default roleService;
+export default RoleService;

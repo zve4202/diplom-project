@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import userService from "../services/user.service";
+import UserService from "../services/user.service";
 
 const initialState = {
     docs: [],
@@ -52,14 +52,14 @@ const { update, resived, requested, requestFailed, removeUpdated } = actions;
 export const loadUsers = (id) => async (dispatch, getState) => {
     dispatch(requested());
     try {
-        const { content } = await userService.fetchAll({
+        const { content } = await UserService.fetchAll({
             paramsName: name
         });
 
         if (id) {
             const user = content.docs.find((doc) => doc._id === id);
             if (!user) {
-                const { content: user } = await userService.get(id);
+                const { content: user } = await UserService.get(id);
                 if (user) {
                     content.docs.push(user);
                     content.totalDocs += 1;
@@ -75,7 +75,7 @@ export const loadUsers = (id) => async (dispatch, getState) => {
 export const updateUser = (user) => async (dispatch, getState) => {
     dispatch(requested());
     try {
-        const { content } = await userService.update(user._id, user);
+        const { content } = await UserService.update(user._id, user);
         dispatch(update(content));
         setTimeout(() => {
             dispatch(removeUpdated());

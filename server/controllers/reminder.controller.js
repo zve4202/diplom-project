@@ -5,12 +5,12 @@ const {
     DATA_CREATED,
     DATA_DELETED
 } = require("../config/config");
-const reminder = require("../models/Reminder");
+const Reminder = require("../models/Reminder");
 
 exports.getAll = async function (req, res, next) {
     try {
         // console.log("getAll", req.user);
-        const data = await reminder.find({ userId: ObjectId(req.user._id) });
+        const data = await Reminder.find({ userId: ObjectId(req.user._id) });
         // console.log("getAll data", data);
         return res.status(200).json({
             status: 200,
@@ -25,7 +25,7 @@ exports.getAll = async function (req, res, next) {
 exports.get = async function (req, res, next) {
     const { titleId } = req.params;
     try {
-        const data = await reminder.findOne({
+        const data = await Reminder.findOne({
             userId: ObjectId(req.user._id),
             titleId: Number(titleId)
         });
@@ -41,7 +41,7 @@ exports.get = async function (req, res, next) {
 
 exports.create = async function (req, res, next) {
     try {
-        const data = await reminder.create({
+        const data = await Reminder.create({
             ...req.body,
             userId: ObjectId(req.user._id)
         });
@@ -61,7 +61,7 @@ exports.create = async function (req, res, next) {
 exports.update = async function (req, res, next) {
     const { titleId } = req.params;
     try {
-        const data = await reminder.findOneAndUpdate(
+        const data = await Reminder.findOneAndUpdate(
             {
                 userId: ObjectId(req.user._id),
                 titleId: Number(titleId)
@@ -89,7 +89,7 @@ exports.update = async function (req, res, next) {
 exports.delete = async function (req, res, next) {
     const { titleId } = req.params;
     try {
-        const data = await reminder.findOneAndDelete({
+        const data = await Reminder.findOneAndDelete({
             userId: ObjectId(req.user._id),
             titleId: Number(titleId)
         });
@@ -109,7 +109,7 @@ exports.delete = async function (req, res, next) {
 
 exports.deleteAll = async function (req, res, next) {
     try {
-        const data = await reminder.deleteMany({
+        const data = await Reminder.deleteMany({
             userId: ObjectId(req.user._id)
         });
 

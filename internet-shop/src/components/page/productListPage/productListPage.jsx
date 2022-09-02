@@ -16,7 +16,7 @@ import { loadOrigins } from "../../../store/origin";
 import { loadStyles } from "../../../store/style";
 import ProductCard from "./card/productCard";
 import { useParams } from "react-router-dom";
-import productService from "../../../services/product.service";
+import ProductService from "../../../services/product.service";
 
 const ProductListPage = () => {
     const { productId } = useParams();
@@ -61,7 +61,7 @@ const ProductListPage = () => {
     }, [productId, product]);
 
     async function getProduct(productId) {
-        const { content } = await productService.get(productId);
+        const { content } = await ProductService.get(productId);
         setProduct(content);
     }
 

@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import labelService from "../services/label.service";
+import LabelService from "../services/label.service";
 import isOutdated from "../utils/isOutdated";
 
 const initialState = {
@@ -36,7 +36,7 @@ export const loadLabels = () => async (dispatch, getState) => {
     if (isOutdated(lastFetch)) {
         dispatch(requested());
         try {
-            const { content } = await labelService.fetchAll();
+            const { content } = await LabelService.fetchAll();
             dispatch(resived(content));
         } catch (error) {
             dispatch(requestFailed(error.message));

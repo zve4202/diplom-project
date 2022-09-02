@@ -1,29 +1,29 @@
 const mongoose = require("mongoose");
 mongoose.Promise = global.Promise;
 
-const db = {};
+const DB = {};
 
-db.mongoose = mongoose;
+DB.mongoose = mongoose;
 
-db.sequence = require("./Sequence");
-db.setting = require("./Setting");
+DB.Sequence = require("./Sequence");
+DB.Setting = require("./Setting");
 
-db.role = require("./Role");
-db.user = require("./User");
-db.reminder = require("./Reminder");
+DB.Role = require("./Role");
+DB.User = require("./User");
+DB.Reminder = require("./Reminder");
 
-db.category = require("./Category");
-db.format = require("./Format");
-db.label = require("./Label");
+DB.Category = require("./Category");
+DB.Format = require("./Format");
+DB.Label = require("./Label");
 
-db.artist = require("./Artist");
-db.title = require("./Title");
-db.title_m = require("./TitleMerged");
+DB.Artist = require("./Artist");
+DB.Title = require("./Title");
+DB.Title_m = require("./TitleMerged");
 
-db.product = require("./Product");
-db.product_m = require("./ProductMerged");
+DB.Product = require("./Product");
+DB.Product_m = require("./ProductMerged");
 
-db.order = require("./Order").order;
-db.order_list = require("./OrderList").orderList;
+DB.Order = require("./Order").Order;
+DB.Order_list = require("./OrderList");
 
-module.exports = db;
+module.exports = DB;

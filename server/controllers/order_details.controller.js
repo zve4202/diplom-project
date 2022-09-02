@@ -4,7 +4,7 @@ const {
     DATA_CREATED,
     DATA_DELETED
 } = require("../config/config");
-const { order_dtls } = require("../models");
+const { Order_dtls } = require("../models");
 
 const { createId } = require("../utils/db_utils");
 
@@ -14,7 +14,7 @@ exports.getAll = async function (req, res, next) {
     const page = req.params.page ? req.params.page : 1;
     const limit = req.params.limit ? req.params.limit : 100;
     try {
-        const data = await order_dtls.find({ orderId });
+        const data = await Order_dtls.find({ orderId });
 
         return res.status(200).json({
             status: 200,
@@ -29,7 +29,7 @@ exports.getAll = async function (req, res, next) {
 exports.get = async function (req, res, next) {
     const { id } = req.params;
     try {
-        const data = await order_dtls.findById(id);
+        const data = await Order_dtls.findById(id);
         return res.status(200).json({
             status: 200,
             content: data,
@@ -43,7 +43,7 @@ exports.get = async function (req, res, next) {
 exports.update = async function (req, res, next) {
     const { id } = req.params;
     try {
-        const data = await order_dtls.findByIdAndUpdate(id, req.body, {
+        const data = await Order_dtls.findByIdAndUpdate(id, req.body, {
             new: true
         });
         return res.status(200).json({
@@ -58,7 +58,7 @@ exports.update = async function (req, res, next) {
 
 exports.add = async function (req, res, next) {
     try {
-        const data = await order_dtls.create({
+        const data = await Order_dtls.create({
             ...req.body,
             _id: createId(order_dtls.name)
         });
@@ -75,7 +75,7 @@ exports.add = async function (req, res, next) {
 exports.delete = async function (req, res, next) {
     const { id } = req.params;
     try {
-        const data = await order_dtls.findByIdAndDelete(id);
+        const data = await Order_dtls.findByIdAndDelete(id);
         if (data === null) {
             throw Error(`id: ${id} not found`);
         }

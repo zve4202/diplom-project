@@ -1,12 +1,12 @@
-const { order } = require("../models/Order");
-const orderList = require("../models/OrderList");
-const product = require("../models/Product");
+const { Order } = require("../models/Order");
+const OrderList = require("../models/OrderList");
+const Product = require("../models/Product");
 
 async function disassemble(doc) {
-    const docs = await orderList.find({ orderId: doc._id });
+    const docs = await OrderList.find({ orderId: doc._id });
 
     docs.forEach(async (item) => {
-        const product = await product.findOneAndUpdate(
+        const product = await Product.findOneAndUpdate(
             { _id: item.product },
             { $inc: { count: item.qty } },
             {
@@ -19,10 +19,10 @@ async function disassemble(doc) {
             item.status = statuses[0];
         }
 
-        await orderList.findByIdAndUpdate(item._id, item);
+        await OrderList.findByIdAndUpdate(item._id, item);
     });
 
-    await order.findByIdAndUpdate(_id, {
+    await Order.findByIdAndUpdate(_id, {
         ...req.body,
         status: statuses[0],
         checkedAt: null
@@ -34,7 +34,7 @@ module.exports = async (req, res, next) => {
         return next();
     }
     try {
-        const orders = await order.find({
+        const orders = await Order.find({
             status: {
                 $in: ["checked", "needpay"]
             }

@@ -69,23 +69,23 @@ async function InitEntities(name, data, model, ASIS = false) {
 }
 
 module.exports = async () => {
-    const settingExists = await models.setting.find();
+    const settingExists = await models.Setting.find();
     if (settingExists.length === 0) {
-        await models.setting.create({ curs: 95, extra_charge: 10 });
+        await models.Setting.create({ curs: 95, extra_charge: 10 });
         debug(`setting in DB ${chalk.green("✓")}`);
     }
 
-    const usersExists = await models.user.find();
+    const usersExists = await models.User.find();
     if (usersExists.length !== usersMock.length) {
         const roles = await InitEntities("roles", rolesMock, models.role, true);
 
-        models.user.collection.drop();
+        models.User.collection.drop();
         const users = await Promise.all(
             usersMock.map(async (user) => {
                 try {
                     user.password = await bcrypt.hash(user.password, salt);
                     delete user._id;
-                    return await models.user.create({
+                    return await models.User.create({
                         ...user,
                         ...generateUserData()
                     });

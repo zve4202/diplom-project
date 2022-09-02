@@ -1,7 +1,7 @@
 import httpService from "./http.service";
 const userEndpoint = "user/";
 
-const userService = {
+const UserService = {
     update: async (id, content) => {
         const { data } = await httpService.put(userEndpoint + id, content);
         return data;
@@ -25,4 +25,4 @@ const userService = {
         return data;
     }
 };
-export default userService;
+export default UserService;

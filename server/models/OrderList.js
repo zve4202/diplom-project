@@ -32,6 +32,6 @@ schema.pre("save", async function (next) {
     next();
 });
 
-const orderList = model("Orderline", schema);
-orderList.collection.createIndex({ product: 1, orderId: 1 }, { unique: true });
-module.exports = orderList;
+const OrderList = model("Orderline", schema);
+OrderList.collection.createIndex({ product: 1, orderId: 1 }, { unique: true });
+module.exports = OrderList;

@@ -87,7 +87,7 @@ exports.info = async function (req, res, next) {
             lastPlace: placeId,
             dataHistory: { [placeId]: { ...deliveryInfo } }
         };
-        await user.save();
+        await User.save();
         // const data = await Model.findByIdAndUpdate(userId, user, {
         //     new: true
         // });

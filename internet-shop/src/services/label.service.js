@@ -1,7 +1,7 @@
 import httpService from "./http.service";
 const endpoint = "label/";
 
-const labelService = {
+const LabelService = {
     update: async (id, content) => {
         const { data } = await httpService.put(endpoint + id, content);
         return data;
@@ -23,4 +23,4 @@ const labelService = {
         return data;
     }
 };
-export default labelService;
+export default LabelService;

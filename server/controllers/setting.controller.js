@@ -1,4 +1,4 @@
-const setting = require("../models/Setting");
+const Setting = require("../models/Setting");
 const {
     DATA_RECEIVED,
     DATA_UPDATED,
@@ -8,7 +8,7 @@ const {
 exports.get = async function (req, res, next) {
     const { id } = req.params;
     try {
-        const data = await setting.findById(1);
+        const data = await Setting.findById(1);
         return res.status(200).json({
             status: 200,
             content: data,
@@ -20,7 +20,7 @@ exports.get = async function (req, res, next) {
 };
 exports.update = async function (req, res, next) {
     try {
-        const data = await setting.findByIdAndUpdate(1, dataUpdate, {
+        const data = await Setting.findByIdAndUpdate(1, dataUpdate, {
             new: true
         });
         return res.status(200).json({

@@ -1,5 +1,5 @@
 const { getSort, getMatching, createId } = require("../utils/db_utils");
-const { product_m, product, setting } = require("../models");
+const { Product_m, Product, Setting } = require("../models");
 
 const {
     DATA_CREATED,
@@ -52,11 +52,11 @@ exports.getAll = async function (req, res, next) {
         // console.log("query, match", query, match);
 
         const aggregate = match
-            ? product_m.aggregate(match, { allowDiskUse: true })
+            ? Product_m.aggregate(match, { allowDiskUse: true })
             : {};
 
-        const data = await product_m.aggregatePaginate(aggregate, options);
-        const { curs } = await setting.findById(1);
+        const data = await Product_m.aggregatePaginate(aggregate, options);
+        const { curs } = await Setting.findById(1);
         data.docs.forEach((item) => (item.priceRub = item.price * curs));
         return res.status(200).json({
             status: 200,
@@ -72,7 +72,7 @@ exports.getAll = async function (req, res, next) {
 exports.get = async function (req, res, next) {
     const { id } = req.params;
     try {
-        const data = await product_m.findById(id);
+        const data = await Product_m.findById(id);
         return res.status(200).json({
             status: 200,
             content: data,
@@ -86,7 +86,7 @@ exports.get = async function (req, res, next) {
 exports.getBarcode = async function (req, res, next) {
     const { id } = req.params;
     try {
-        const data = await product_m.find({ "title.barcode": id });
+        const data = await Product_m.find({ "title.barcode": id });
         return res.status(200).json({
             status: 200,
             content: data,
@@ -100,7 +100,7 @@ exports.getBarcode = async function (req, res, next) {
 exports.update = async function (req, res, next) {
     const { id } = req.params;
     try {
-        const data = await product.findByIdAndUpdate(id, req.body, {
+        const data = await Product.findByIdAndUpdate(id, req.body, {
             new: true
         });
         return res.status(200).json({
@@ -115,7 +115,7 @@ exports.update = async function (req, res, next) {
 
 exports.add = async function (req, res, next) {
     try {
-        const data = await product_m.findById((await product.create(body))._id);
+        const data = await Product_m.findById((await Product.create(body))._id);
         return res.status(200).json({
             status: 200,
             content: data,
@@ -129,7 +129,7 @@ exports.add = async function (req, res, next) {
 exports.delete = async function (req, res, next) {
     const { id } = req.params;
     try {
-        const data = await product.findByIdAndDelete(id);
+        const data = await Product.findByIdAndDelete(id);
         if (data === null) {
             throw Error(`id: ${id} not found`);
         }

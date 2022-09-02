@@ -1,6 +1,6 @@
-const { order, statuses } = require("../models/Order");
-const orderList = require("../models/OrderList");
-const product = require("../models/Product");
+const { Order, statuses } = require("../models/Order");
+const OrderList = require("../models/OrderList");
+const Product = require("../models/Product");
 
 const {
     DATA_CREATED,
@@ -31,7 +31,7 @@ exports.get = async function (req, res, next) {
         ? req.match
         : { userIp: ip, status: { $in: status } };
     try {
-        const data = await order.aggregate(agg(match));
+        const data = await Order.aggregate(agg(match));
         if (data.length === 0) {
             req.match = match;
             return next();
@@ -49,7 +49,7 @@ exports.get = async function (req, res, next) {
 
 exports.add = async function (req, res, next) {
     try {
-        const data = await order.create(req.match);
+        const data = await Order.create(req.match);
         if (data) {
             req.match = { _id: data._id };
             return next();
@@ -95,7 +95,7 @@ const aggList = (id) => [
 exports.getItems = async function (req, res, next) {
     const { orderId } = req.params;
     try {
-        const data = await orderList.aggregate(aggList(Number(orderId)));
+        const data = await OrderList.aggregate(aggList(Number(orderId)));
         return res.status(200).json({
             status: 200,
             content: data,
@@ -110,11 +110,11 @@ exports.updateListItem = async function (req, res, next) {
     try {
         let data;
         if (req.body._id) {
-            data = await orderList.findByIdAndUpdate(req.body._id, req.body, {
+            data = await OrderList.findByIdAndUpdate(req.body._id, req.body, {
                 new: true
             });
         } else {
-            data = await orderList.create(req.body);
+            data = await OrderList.create(req.body);
         }
         return res.status(200).json({
             status: 200,
@@ -131,7 +131,7 @@ exports.updateListItem = async function (req, res, next) {
 exports.delete = async function (req, res, next) {
     const { id: _id } = req.params;
     try {
-        const data = await orderList.findByIdAndDelete({ _id });
+        const data = await OrderList.findByIdAndDelete({ _id });
         return res.status(200).json({
             status: 200,
             content: data,
@@ -145,7 +145,7 @@ exports.delete = async function (req, res, next) {
 exports.deleteAll = async function (req, res, next) {
     const { orderId } = req.params;
     try {
-        const data = await orderList.deleteMany({ orderId });
+        const data = await OrderList.deleteMany({ orderId });
         return res.status(200).json({
             status: 200,
             content: data,
@@ -161,7 +161,7 @@ exports.check = async function (req, res, next) {
         const { _id, docs } = req.body;
         docs.forEach(async (item) => {
             const needQty = item.qty;
-            const product = await product.findOneAndUpdate(
+            const product = await Product.findOneAndUpdate(
                 { _id: item.product },
                 { $inc: { count: -item.qty } },
                 {
@@ -171,7 +171,7 @@ exports.check = async function (req, res, next) {
             if (product.count < 0) {
                 const qty = product.count + item.qty;
                 item.qty = Math.max(0, qty);
-                await product.findOneAndUpdate(
+                await Product.findOneAndUpdate(
                     { _id: item.product },
                     { $inc: { count: -qty } },
                     {
@@ -188,10 +188,10 @@ exports.check = async function (req, res, next) {
                 item.status = statuses[statuses.length - 2];
             } else item.status = statuses[1];
 
-            await orderList.findByIdAndUpdate(item._id, item);
+            await OrderList.findByIdAndUpdate(item._id, item);
         });
 
-        const data = await order.findByIdAndUpdate(_id, {
+        const data = await Order.findByIdAndUpdate(_id, {
             ...req.body,
             status: statuses[1],
             checkedAt: new Date()
@@ -211,7 +211,7 @@ exports.disassemble = async function (req, res, next) {
     try {
         const { _id, docs } = req.body;
         docs.forEach(async (item) => {
-            const product = await product.findOneAndUpdate(
+            const product = await Product.findOneAndUpdate(
                 { _id: item.product },
                 { $inc: { count: item.qty } },
                 {
@@ -224,10 +224,10 @@ exports.disassemble = async function (req, res, next) {
                 item.status = statuses[0];
             }
 
-            await orderList.findByIdAndUpdate(item._id, item);
+            await OrderList.findByIdAndUpdate(item._id, item);
         });
 
-        const data = await order.findByIdAndUpdate(_id, {
+        const data = await Order.findByIdAndUpdate(_id, {
             ...req.body,
             status: statuses[0],
             checkedAt: null
@@ -249,7 +249,7 @@ exports.apply = async function (req, res, next) {
         const { payment } = deliveryInfo;
         const status = payment === "Acquiring" ? statuses[2] : statuses[3];
 
-        const data = await order.findByIdAndUpdate(_id, {
+        const data = await Order.findByIdAndUpdate(_id, {
             ...req.body,
             status
         });
@@ -269,7 +269,7 @@ exports.setPay = async function (req, res, next) {
         const { _id, sumOfPay } = req.body;
         const status = statuses[3];
 
-        const data = await order.findByIdAndUpdate(_id, {
+        const data = await Order.findByIdAndUpdate(_id, {
             ...req.body,
             sumOfPay,
             status

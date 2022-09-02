@@ -222,6 +222,7 @@ export const checkBasket = () => async (dispatch, getState) => {
         dispatch(requested());
         const { content } = await Service.check(basketData);
         dispatch(resived(content));
+        dispatch(loadBasket());
     } catch (error) {
         dispatch(requestFailed(error.message));
     }
@@ -242,12 +243,12 @@ export const applyBasket = () => async (dispatch, getState) => {
         return;
     }
     const basketData = { ...data, userId: authUser._id };
-    console.log("applyBasket", basketData);
 
     try {
         dispatch(requested());
         const { content } = await Service.apply(basketData);
         dispatch(resived(content));
+        dispatch(loadBasket());
     } catch (error) {
         dispatch(requestFailed(error.message));
     }
@@ -274,6 +275,7 @@ export const payOrder = (sumOfPay) => async (dispatch, getState) => {
         dispatch(requested());
         const { content } = await Service.topay(basketData);
         dispatch(resived(content));
+        setTimeout(() => dispatch(loadBasket()), [5000]);
     } catch (error) {
         dispatch(requestFailed(error.message));
     }
@@ -297,9 +299,8 @@ export const disassemble = () => async (dispatch, getState) => {
     try {
         dispatch(requested());
         const { content } = await Service.disassemble(data);
-        setTimeout(() => {
-            dispatch(resived(content));
-        }, [10000]);
+        dispatch(resived(content));
+        setTimeout(() => () => dispatch(loadBasket()), [5000]);
     } catch (error) {
         dispatch(requestFailed(error.message));
     }

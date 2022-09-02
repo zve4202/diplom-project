@@ -1,7 +1,7 @@
 // const conf = require("../config/config.db");
 // const gen = require("mongo-incremental-id-generator")(conf.connection_string);
 
-const sequences = require("../models/Sequence");
+const Sequences = require("../models/Sequence");
 /*
 function getNextSequence(name) {
    var ret = db.counters.findAndModify(
@@ -18,7 +18,7 @@ function getNextSequence(name) {
 */
 
 const createId = async (name) => {
-    const ret = await sequences.findOneAndUpdate(
+    const ret = await Sequences.findOneAndUpdate(
         { _id: name },
         { $inc: { seq: 1 } },
         {

@@ -6,7 +6,7 @@ import classNames from "classnames";
 import { yesNo } from "../../../dialogs/messageDialog";
 import { acquiring } from "./applyForm/payments";
 
-const GoToPayButton = ({ step, onAccept }) => {
+const ApplyBasketButton = ({ step, onAccept }) => {
     const data = useSelector((state) => state.basket.data);
     const { status, deliveryInfo } = data;
     if (status === "needpay") return null;
@@ -31,6 +31,13 @@ const GoToPayButton = ({ step, onAccept }) => {
 
     const isDisabled = !(step === "basket" || deliveryInfo?.isValid);
 
+    const todo =
+        status === "basket"
+            ? "check"
+            : status === "checked"
+            ? "apply"
+            : "topay";
+
     return (
         <div>
             <button
@@ -38,9 +45,9 @@ const GoToPayButton = ({ step, onAccept }) => {
                 role="button"
                 onClick={() => {
                     if (status === "basket") {
-                        yesNo(question, onAccept);
+                        yesNo(question, () => onAccept(todo));
                     } else {
-                        onAccept();
+                        onAccept(todo);
                     }
                 }}
                 title={tooltip}
@@ -59,9 +66,9 @@ const GoToPayButton = ({ step, onAccept }) => {
     );
 };
 
-GoToPayButton.propTypes = {
+ApplyBasketButton.propTypes = {
     step: PropTypes.string.isRequired,
     onAccept: PropTypes.func.isRequired
 };
 
-export default GoToPayButton;
+export default ApplyBasketButton;

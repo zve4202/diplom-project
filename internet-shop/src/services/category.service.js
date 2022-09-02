@@ -1,7 +1,7 @@
 import httpService from "./http.service";
 const categoryEndpoint = "category/";
 
-const categoryService = {
+const CategoryService = {
     update: async (id, content) => {
         const { data } = await httpService.put(categoryEndpoint + id, content);
         return data;
@@ -23,4 +23,4 @@ const categoryService = {
         return data;
     }
 };
-export default categoryService;
+export default CategoryService;

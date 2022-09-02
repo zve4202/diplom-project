@@ -1,10 +1,10 @@
-const { title } = require("../models");
+const { Title } = require("../models");
 const { DATA_RECEIVED } = require("../config/config");
 
 exports.getAll = async function (req, res, next) {
     try {
         const data = await (
-            await title.distinct("origin")
+            await Title.distinct("origin")
         )
             .filter((item) => item && item > "")
             .sort((a, b) => {
