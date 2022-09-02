@@ -14,5 +14,6 @@ router.delete("/all/:orderId", Controller.deleteAll);
 router.put("/check", [auth], Controller.check);
 router.put("/apply", [auth], UserController.info, Controller.apply);
 router.put("/topay", [auth], Controller.setPay);
+router.put("/disassemble", [auth], Controller.disassemble);
 
 module.exports = router;

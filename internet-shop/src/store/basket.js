@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { getDeliveryBy } from "../components/page/basketPage/applyForm/deliveries";
 
 import Service from "../services/basket.service";
 import history from "../utils/history";
@@ -14,7 +15,6 @@ const initialState = {
         totalQty: 0,
         totalPrice: 0
     },
-
     docsLoading: true,
     productsLoading: false,
     error: null
@@ -267,14 +267,39 @@ export const payOrder = (sumOfPay) => async (dispatch, getState) => {
         return;
     }
     const { data } = getState().basket;
-    const deliveryInfo = { ...data.deliveryInfo, sumOfPay };
 
-    const basketData = { ...data, deliveryInfo, userId: authUser._id };
+    const basketData = { ...data, sumOfPay, userId: authUser._id };
 
     try {
         dispatch(requested());
         const { content } = await Service.topay(basketData);
         dispatch(resived(content));
+    } catch (error) {
+        dispatch(requestFailed(error.message));
+    }
+};
+
+export const disassemble = () => async (dispatch, getState) => {
+    const authUser = getState().auth.authUser;
+    if (!authUser) {
+        history.push({
+            pathname: "/login",
+            state: {
+                from: {
+                    pathname: "/basket/topay"
+                }
+            }
+        });
+        return;
+    }
+    const { data } = getState().basket;
+
+    try {
+        dispatch(requested());
+        const { content } = await Service.disassemble(data);
+        setTimeout(() => {
+            dispatch(resived(content));
+        }, [10000]);
     } catch (error) {
         dispatch(requestFailed(error.message));
     }
@@ -288,6 +313,26 @@ export const getBasketQty = (id) => (state) => {
         if (doc) return doc.qty;
     }
     return null;
+};
+export const getTotals = () => (state) => {
+    const { deliveryInfo, totalQty, totalPrice } = state.basket.data;
+    if (!deliveryInfo) {
+        return {
+            totalQty,
+            totalPrice,
+            deliveryPrice: 0,
+            fullPrice: 0
+        };
+    }
+
+    const { delivery } = deliveryInfo;
+    const { deliveryPrice } = getDeliveryBy(delivery);
+    return {
+        totalQty,
+        totalPrice,
+        deliveryPrice,
+        fullPrice: totalPrice + deliveryPrice
+    };
 };
 
 export const getBasketError = () => (state) => state.basket.error;

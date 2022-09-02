@@ -41,10 +41,6 @@ class ApplyForm extends Component {
         this.validate();
     }
 
-    componentWillUnmount() {
-        // clearInterval(this.timerId);
-    }
-
     componentDidUpdate(prevProps, prevState) {
         const { persone } = this.state.deliveryInfo;
         const { authUser } = this.props;
@@ -149,6 +145,8 @@ class ApplyForm extends Component {
     }
 
     getReadOnly(name) {
+        const { status } = this.props.data;
+        if (status === "needpay") return true;
         switch (name) {
             case "index": {
                 const { delivery } = this.state.deliveryInfo;
@@ -266,20 +264,26 @@ class ApplyForm extends Component {
                         Корзина на проверке...
                     </div>
                 )}
-                {data.status === "checked" && (
-                    <div>
-                        <div className="card-header">
-                            <i className="bi bi-check2-square me-2" />
-                            Корзина проверена.
-                        </div>
-                        <div className="col-md-8">
-                            <div className="card-body px-0">
-                                <CheckAlerter data={data.checkedAt} />
-                                {this.createControls()}
-                            </div>
-                        </div>
+                {step === "apply" && (
+                    <div className="form-control bg-success bg-opacity-10 text-md-center text-success">
+                        <span className="spinner-border spinner-border-sm  me-2" />
+                        Заказ в обработке...
                     </div>
                 )}
+                <div>
+                    <div className="card-header">
+                        <i className="bi bi-check2-square me-2" />
+                        {data.status === "checked"
+                            ? "Корзина проверена."
+                            : "Заказ принят."}
+                    </div>
+                    <div className="col-md-8">
+                        <div className="card-body px-0">
+                            <CheckAlerter />
+                            {this.createControls()}
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

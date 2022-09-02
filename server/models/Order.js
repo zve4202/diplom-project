@@ -40,10 +40,11 @@ const schema = new Schema(
                 index: "",
                 address: "",
                 note: "",
-                isValid: false,
-                sumOfPay: 0
+                isValid: false
             }
         },
+
+        sumOfPay: { type: Number, default: 0 },
         checkedAt: { type: Date }
     },
     { timestamps: true }

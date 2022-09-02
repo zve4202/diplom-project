@@ -207,6 +207,42 @@ exports.check = async function (req, res, next) {
     }
 };
 
+exports.disassemble = async function (req, res, next) {
+    try {
+        const { _id, docs } = req.body;
+        docs.forEach(async (item) => {
+            const product = await product.findOneAndUpdate(
+                { _id: item.product },
+                { $inc: { count: item.qty } },
+                {
+                    new: true
+                }
+            );
+
+            if (item.needQty) {
+                item.qty = item.needQty;
+                item.status = statuses[0];
+            }
+
+            await orderList.findByIdAndUpdate(item._id, item);
+        });
+
+        const data = await order.findByIdAndUpdate(_id, {
+            ...req.body,
+            status: statuses[0],
+            checkedAt: null
+        });
+
+        return res.status(200).json({
+            status: 200,
+            content: data,
+            message: DATA_UPDATED
+        });
+    } catch (e) {
+        return res.status(500).json({ status: 500, message: e.message });
+    }
+};
+
 exports.apply = async function (req, res, next) {
     try {
         const { _id, deliveryInfo } = req.body;
@@ -230,12 +266,12 @@ exports.apply = async function (req, res, next) {
 
 exports.setPay = async function (req, res, next) {
     try {
-        const { _id, deliveryInfo } = req.body;
+        const { _id, sumOfPay } = req.body;
         const status = statuses[3];
 
         const data = await order.findByIdAndUpdate(_id, {
             ...req.body,
-            deliveryInfo,
+            sumOfPay,
             status
         });
 

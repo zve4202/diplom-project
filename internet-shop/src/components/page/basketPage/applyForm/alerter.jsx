@@ -1,45 +1,58 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
+
+import { disassemble } from "../../../../store/basket";
 import { sklonenie } from "../../../../utils/sklonenie";
 
 const fiveMinutes = 5 * 60 * 1000;
 
 class CheckAlerter extends Component {
     timerId;
+    diff;
     diffDays;
     diffHours;
     diffMinutes;
     constructor(props) {
         super(props);
         const { checkedAt } = this.props.data;
+
         this.state = {
-            checkedAt,
+            checkedAt: checkedAt,
             refresh: false
         };
+
         this.refreshContent = this.refreshContent.bind(this);
+        this.initDeadline = this.initDeadline.bind(this);
     }
 
     componentDidMount() {
         this.timerId = setInterval(this.refreshContent, fiveMinutes);
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        if (this.state.refresh !== prevState.refresh) {
-            const deadline = new Date(data).setDate(
-                new Date(data).getDate() + 3
-            );
-            const diff = deadline - new Date();
-            this.diffDays =
-                diff > 0 ? Math.floor(diff / 1000 / 60 / 60 / 24) : 0;
-            this.diffHours =
-                diff > 0 ? Math.floor(diff / 1000 / 60 / 60) % 24 : 0;
-            this.diffMinutes = diff > 0 ? Math.floor(diff / 1000 / 60) % 60 : 0;
-        }
+        this.initDeadline();
     }
 
     componentWillUnmount() {
         clearInterval(this.timerId);
+    }
+
+    initDeadline() {
+        const { checkedAt } = this.state;
+        const deadline = new Date(checkedAt).setDate(
+            new Date(checkedAt).getDate() + 3
+        );
+        const diff = deadline - new Date();
+        this.diffDays = diff > 0 ? Math.floor(diff / 1000 / 60 / 60 / 24) : 0;
+        this.diffHours = diff > 0 ? Math.floor(diff / 1000 / 60 / 60) % 24 : 0;
+        this.diffMinutes = diff > 0 ? Math.floor(diff / 1000 / 60) % 60 : 0;
+        if (diff <= 0) {
+            this.props.disassemble();
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (this.state.refresh !== prevState.refresh) {
+            this.initDeadline();
+        }
     }
 
     refreshContent() {
@@ -165,8 +178,7 @@ class CheckAlerter extends Component {
 CheckAlerter.propTypes = {
     data: PropTypes.object,
     authUser: PropTypes.object,
-    updateDlvInfo: PropTypes.func,
-    payOrder: PropTypes.func
+    disassemble: PropTypes.func
 };
 
 const mapStateToProps = (state) => {
@@ -179,8 +191,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-    updateDlvInfo,
-    payOrder
+    disassemble
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CheckAlerter);

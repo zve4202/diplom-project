@@ -33,6 +33,13 @@ const basketService = {
     apply: async (content) => {
         const { data } = await httpService.put(endpoint + "apply/", content);
         return data;
+    },
+    disassemble: async (content) => {
+        const { data } = await httpService.put(
+            endpoint + "disassemble/",
+            content
+        );
+        return data;
     }
 };
 export default basketService;

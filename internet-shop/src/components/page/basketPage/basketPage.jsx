@@ -14,7 +14,6 @@ import WorkScreen from "../../common/wrappers/workScreen";
 import menu from "./menu";
 import ContentWrapper from "../../common/wrappers/content";
 import ApplyForm from "./applyForm/applyForm";
-import PayForm from "./payForm/payForm";
 
 const BasketPage = () => {
     let { step } = useParams();
@@ -54,7 +53,6 @@ const BasketPage = () => {
     };
 
     useEffect(() => {
-        console.log("useEffect", data.status, stepName);
         if (data.status === "basket" && stepName === "check") {
             dispatch(checkBasket());
         }
@@ -91,11 +89,7 @@ const BasketPage = () => {
                 onCheckAndPay={handleCheckAndPay}
             />
             <ContentWrapper menu={menu.caption}>
-                {data.status === "needpay" ? (
-                    <PayForm step={stepName} />
-                ) : (
-                    <ApplyForm step={stepName} />
-                )}
+                <ApplyForm step={stepName} />
                 <BasketTable
                     name={menu.name}
                     data={products || []}

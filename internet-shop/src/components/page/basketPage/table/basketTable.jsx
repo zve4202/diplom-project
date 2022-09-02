@@ -7,6 +7,7 @@ import ProductPicture from "../../productListPage/table/productPicture";
 import ProductQty from "../../productListPage/table/productQty";
 import ProductPrice from "../../productListPage/table/productPrice";
 import ProductName from "../../productListPage/table/productName";
+import StatusText from "../../../common/form/statusText";
 
 const BasketTable = ({ name, data, totalDocs, loading, onReload, ...rest }) => {
     const getData = (item) => {
@@ -30,15 +31,19 @@ const BasketTable = ({ name, data, totalDocs, loading, onReload, ...rest }) => {
         };
     };
 
-    const prouctQty = (data) => {
+    const prouctQty = (data, name) => {
         if (rest.readOnly) {
             return (
-                <div className="form-control bg-secondary bg-opacity-10 text-center">
-                    {data.qty}
+                <div className="g-3">
+                    <div className="form-control bg-secondary bg-opacity-10 text-center">
+                        {data.qty}
+                        {data.needQty ? `/${data.needQty}` : ""}
+                    </div>
+                    <StatusText status={data.status} classname="warning" />
                 </div>
             );
         }
-        return <ProductQty data={data} />;
+        return <ProductQty data={data} name={name} />;
     };
     const columns = [
         {
@@ -50,7 +55,7 @@ const BasketTable = ({ name, data, totalDocs, loading, onReload, ...rest }) => {
             caption: "Корзина",
             name: "add",
             width: 190,
-            component: (item) => prouctQty(getData(item))
+            component: (item) => prouctQty(getData(item), name)
         },
         {
             caption: "Цена",

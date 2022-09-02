@@ -9,6 +9,8 @@ import { acquiring } from "./applyForm/payments";
 const GoToPayButton = ({ step, onAccept }) => {
     const data = useSelector((state) => state.basket.data);
     const { status, deliveryInfo } = data;
+    if (status === "needpay") return null;
+
     const question =
         "Вы действительно желаете отправить корзину на проверку, и перейти к оформлению и оплате?";
 
@@ -28,10 +30,11 @@ const GoToPayButton = ({ step, onAccept }) => {
             : "Завершить оформление";
 
     const isDisabled = !(step === "basket" || deliveryInfo?.isValid);
+
     return (
         <div>
             <button
-                className="btn btn-outline-success w-100 list-group-item-success"
+                className="btn btn-outline-success w-100 list-group-item-success mt-3"
                 role="button"
                 onClick={() => {
                     if (status === "basket") {

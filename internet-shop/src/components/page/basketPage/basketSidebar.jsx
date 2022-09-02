@@ -12,6 +12,7 @@ import BackButton from "../../common/backButton";
 import ClearBasketButton from "./clearBasketButton";
 import GoToPayButton from "./goToPayButton";
 import BasketTotals from "./basketTotals";
+import PayForm from "./payForm/payForm";
 
 const BasketSidebar = ({ menu, step, onCheckAndPay }) => {
     const basket = useSelector(getBasket());
@@ -61,6 +62,7 @@ const BasketSidebar = ({ menu, step, onCheckAndPay }) => {
                         onAccept={handleClearBasket}
                     />
                     <GoToPayButton step={step} onAccept={onCheckAndPay} />
+                    <PayForm className="mt-3" />
                 </div>
             )}
         </SideBarWrapper>

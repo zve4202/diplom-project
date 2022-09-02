@@ -4,6 +4,7 @@ import { yesNo } from "../../../dialogs/messageDialog";
 import { useParams } from "react-router-dom";
 
 const ClearBasketButton = ({ status, onAccept }) => {
+    if (status !== "basket") return null;
     const question = "Вы действительно желаете очистить вашу корзину?";
     const { step } = useParams();
 
@@ -11,7 +12,7 @@ const ClearBasketButton = ({ status, onAccept }) => {
         <div>
             <button
                 type="button"
-                className="btn btn-outline-danger w-100 list-group-item-danger mb-2 mt-3"
+                className="btn btn-outline-danger w-100 list-group-item-danger mt-3"
                 role="button"
                 onClick={() => {
                     yesNo(question, onAccept);
