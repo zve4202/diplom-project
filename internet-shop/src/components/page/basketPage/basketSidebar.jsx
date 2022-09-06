@@ -30,7 +30,7 @@ const BasketSidebar = ({ menu, step, onCheckAndPay }) => {
             }, [3000]);
         } else {
             dispatch(disassemble());
-            onCheckAndPay("undo");
+            onCheckAndPay(todo);
         }
     };
 

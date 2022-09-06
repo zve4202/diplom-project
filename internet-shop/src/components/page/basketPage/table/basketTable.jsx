@@ -4,14 +4,14 @@ import PropTypes from "prop-types";
 import Table from "../../../common/table";
 import Barcode from "../../../ui/barcode";
 import ProductPicture from "../../productListPage/table/productPicture";
-import ProductQty from "../../productListPage/table/productQty";
+import BasketQty from "./basketQty";
 import ProductPrice from "../../productListPage/table/productPrice";
 import ProductName from "../../productListPage/table/productName";
-import StatusText from "../../../common/form/statusText";
+// import StatusText from "../../../common/form/statusText";
 
 const BasketTable = ({ name, data, totalDocs, loading, onReload, ...rest }) => {
-    const getData = (item) => {
-        const { qty, price, product } = item;
+    const getItemData = (item) => {
+        const { qty, needQty, status, price, product } = item;
         const { _id, count, title } = product;
         const { format, barcode, label, style, origin } = title;
         const nf = Intl.NumberFormat();
@@ -20,6 +20,8 @@ const BasketTable = ({ name, data, totalDocs, loading, onReload, ...rest }) => {
             _id,
             title,
             qty,
+            needQty,
+            status,
             price,
             priceFmt: nf.format(price),
             count,
@@ -31,65 +33,70 @@ const BasketTable = ({ name, data, totalDocs, loading, onReload, ...rest }) => {
         };
     };
 
-    const prouctQty = (data, name) => {
-        if (rest.readOnly) {
-            return (
-                <div className="g-3">
-                    <div className="form-control bg-secondary bg-opacity-10 text-center">
-                        {data.qty}
-                        {data.needQty ? `/${data.needQty}` : ""}
-                    </div>
-                    <StatusText status={data.status} classname="warning" />
-                </div>
-            );
-        }
-        return <ProductQty data={data} name={name} />;
-    };
+    // const prouctQty = (data, name) => {
+    //     if (rest.readOnly) {
+    //         console.log("prouctQty", data.qty, data.needQty, data.status);
+    //         return (
+    //             <div className="g-3">
+    //                 <div className="form-control bg-secondary bg-opacity-10 text-center">
+    //                     {data.qty}
+    //                     {data.needQty ? `/${data.needQty}` : ""}
+    //                 </div>
+    //                 <StatusText status={data.status} classname="warning" />
+    //             </div>
+    //         );
+    //     }
+    //     return <BasketQty data={data} name={name} />;
+    // };
     const columns = [
         {
             name: "image",
             width: 85,
-            component: (item) => <ProductPicture data={getData(item)} />
+            component: (item) => <ProductPicture data={getItemData(item)} />
         },
         {
             caption: "Корзина",
             name: "add",
             width: 190,
-            component: (item) => prouctQty(getData(item), name)
+            component: (item) => (
+                <BasketQty item={getItemData(item)} name={name} />
+            )
         },
         {
             caption: "Цена",
             name: "price",
             sortable: true,
             width: 115,
-            component: (item) => <ProductPrice price={getData(item).priceFmt} />
+            component: (item) => (
+                <ProductPrice price={getItemData(item).priceFmt} />
+            )
         },
         {
             caption: "Наименоване",
             name: "name",
             sortable: true,
             width: 300,
-            component: (item) => <ProductName data={getData(item)} />
+            component: (item) => <ProductName data={getItemData(item)} />
         },
         {
             caption: "Формат",
             name: "format",
             sortable: true,
             component: (item) => (
-                <div className="small">{getData(item).format.name}</div>
+                <div className="small">{getItemData(item).format.name}</div>
             )
         },
         {
             caption: "Штрихкод",
             name: "barcode",
-            component: (item) => <Barcode barcode={getData(item).barcode} />
+            component: (item) => <Barcode barcode={getItemData(item).barcode} />
         },
         {
             caption: "Лейбл",
             name: "label",
             sortable: true,
             component: (item) => (
-                <div className="small">{getData(item).label.name}</div>
+                <div className="small">{getItemData(item).label.name}</div>
             )
         },
         {
@@ -97,7 +104,7 @@ const BasketTable = ({ name, data, totalDocs, loading, onReload, ...rest }) => {
             name: "origin",
             sortable: true,
             component: (item) => (
-                <div className="small">{getData(item).origin}</div>
+                <div className="small">{getItemData(item).origin}</div>
             )
         },
         {
@@ -105,7 +112,7 @@ const BasketTable = ({ name, data, totalDocs, loading, onReload, ...rest }) => {
             name: "style",
             sortable: true,
             component: (item) => (
-                <div className="small">{getData(item).style}</div>
+                <div className="small">{getItemData(item).style}</div>
             )
         }
     ];

@@ -1,90 +1,155 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
 
-import BasketSidebar from "./basketSidebar";
-import BasketTable from "./table/basketTable";
+import menu from "./menu";
 import {
     applyBasket,
     checkBasket,
+    loadBasket,
     loadBasketItems,
     payOrder
 } from "../../../store/basket";
 import WorkScreen from "../../common/wrappers/workScreen";
-import menu from "./menu";
 import ContentWrapper from "../../common/wrappers/content";
+import BasketTable from "./table/basketTable";
 import ApplyForm from "./applyForm/applyForm";
+import BasketSidebar from "./basketSidebar";
 
-const BasketPage = () => {
-    let step;
-    const dispatch = useDispatch();
-
-    const { productsLoading, data } = useSelector((state) => state.basket);
-    const { products, _id } = data;
-
-    switch (data.status) {
-        case "basket":
-            step = "show";
-            break;
-        case "checked":
-            step = "check";
-            break;
-        case "needpay":
-            step = "needpay";
-            break;
-        default:
-            step = "undoCheck";
-            break;
+class BasketPage extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            step: "show"
+        };
+        this.handleReload = this.handleReload.bind(this);
+        this.setCurrStep = this.setCurrStep.bind(this);
+        this.setStepName = this.setStepName.bind(this);
+        this.handleCheckAndPay = this.handleCheckAndPay.bind(this);
     }
 
-    const [stepName, setStepName] = useState(step);
-
-    useEffect(() => {
-        if (_id) {
-            dispatch(loadBasketItems(_id));
+    setCurrStep() {
+        const { data } = this.props;
+        let step = "show";
+        switch (data.status) {
+            case "basket":
+                break;
+            case "checked":
+                step = "check";
+                break;
+            case "needpay":
+                step = "needpay";
+                break;
+            default:
+                step = "undoCheck";
+                break;
         }
-    }, [_id]);
+        this.setStepName(step);
+        this.handleReload();
+    }
 
-    const handleReload = () => {
-        if (_id) {
-            dispatch(loadBasketItems(_id));
-        }
-    };
+    setStepName(step) {
+        this.setState((state) => ({ ...state, step }));
+    }
 
-    useEffect(() => {
-        if (data.status === "basket" && stepName === "check") {
-            dispatch(checkBasket());
-        }
-        if (data.status === "checked" && stepName === "apply") {
-            dispatch(applyBasket());
-        }
-        if (data.status === "needpay" && stepName === "topay") {
-            dispatch(payOrder());
-        }
-    }, [stepName, data.status]);
+    componentDidMount() {
+        this.setCurrStep();
+    }
 
-    const handleCheckAndPay = (todo) => {
-        setStepName(todo);
-    };
+    handleCheckAndPay(todo) {
+        this.setStepName(todo);
+    }
 
-    return (
-        <WorkScreen>
-            <BasketSidebar
-                menu={menu}
-                step={stepName}
-                onCheckAndPay={handleCheckAndPay}
-            />
-            <ContentWrapper menu={menu.caption}>
-                <ApplyForm step={stepName} />
-                <BasketTable
-                    name={menu.name}
-                    data={products || []}
-                    loading={productsLoading}
-                    onReload={handleReload}
-                    readOnly={data.status !== "basket"}
+    componentDidUpdate(prevProps, prevState) {
+        const { step } = this.state;
+        const { data, checkBasket, applyBasket, payOrder } = this.props;
+        const { status } = data;
+        try {
+            if (step !== prevState.step) {
+                if (status === "basket" && step === "check") {
+                    checkBasket();
+                } else if (status === "checked") {
+                    if (step === "apply") {
+                        applyBasket();
+                    }
+                } else if (status === "needpay" && step === "topay") {
+                    payOrder();
+                }
+            }
+        } catch (error) {
+            console.log(error);
+        }
+
+        if (status !== prevProps.data.status) {
+            setTimeout(() => {
+                this.handleReload();
+            }, [250]);
+        }
+    }
+
+    componentWillUnmount() {}
+
+    handleReload() {
+        const { data, loadBasketItems } = this.props;
+        if (data._id) {
+            loadBasketItems(data._id);
+        }
+    }
+
+    render() {
+        const { step } = this.state;
+        const { data, productsLoading } = this.props;
+        const { products } = data;
+        console.log("render", data);
+
+        return (
+            <WorkScreen>
+                <BasketSidebar
+                    menu={menu}
+                    step={step}
+                    onCheckAndPay={this.handleCheckAndPay}
                 />
-            </ContentWrapper>
-        </WorkScreen>
-    );
+                <ContentWrapper menu={menu.caption}>
+                    <ApplyForm step={step} />
+                    <BasketTable
+                        name={menu.name}
+                        data={products || []}
+                        loading={productsLoading}
+                        onReload={this.handleReload}
+                        readOnly={data.status !== "basket"}
+                    />
+                </ContentWrapper>
+            </WorkScreen>
+        );
+    }
+}
+
+BasketPage.propTypes = {
+    data: PropTypes.object,
+    docsLoading: PropTypes.bool,
+    productsLoading: PropTypes.bool,
+    applyBasket: PropTypes.func,
+    checkBasket: PropTypes.func,
+    loadBasket: PropTypes.func,
+    loadBasketItems: PropTypes.func,
+    payOrder: PropTypes.func
 };
 
-export default BasketPage;
+const mapStateToProps = (state) => {
+    const { data, docsLoading, productsLoading } = state.basket;
+    return {
+        data,
+        docsLoading,
+        productsLoading
+    };
+};
+
+const mapDispatchToProps = {
+    applyBasket,
+    checkBasket,
+    loadBasket,
+    loadBasketItems,
+    payOrder
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(BasketPage);

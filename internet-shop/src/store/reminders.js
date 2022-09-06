@@ -41,7 +41,6 @@ const basketSlice = createSlice({
                 (item) => item.titleId !== action.payload
             );
             state.docs = docs;
-            console.log("remove state.docs ", state.docs);
             state.isLoading = false;
         },
         requestFailed(state, action) {
@@ -90,6 +89,7 @@ export const addReminder = (payload) => async (dispatch, getState) => {
         history.push("/login");
         return;
     }
+
     dispatch(requested());
     try {
         const { content } = await Service.create(payload);

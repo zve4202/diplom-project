@@ -95,7 +95,7 @@ http.interceptors.response.use(
 );
 const httpService = {
     get: http.get,
-    byRussianPost: http.post,
+    post: http.post,
     put: http.put,
     patch: http.patch,
     delete: http.delete

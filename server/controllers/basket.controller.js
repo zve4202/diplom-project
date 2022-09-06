@@ -114,7 +114,9 @@ exports.updateListItem = async function (req, res, next) {
                 new: true
             });
         } else {
-            data = await OrderList.create(req.body);
+            data = await OrderList.create(req.body, {
+                new: true
+            });
         }
         return res.status(200).json({
             status: 200,
@@ -131,7 +133,12 @@ exports.updateListItem = async function (req, res, next) {
 exports.delete = async function (req, res, next) {
     const { id: _id } = req.params;
     try {
-        const data = await OrderList.findByIdAndDelete({ _id });
+        const data = await OrderList.findByIdAndDelete(
+            { _id },
+            {
+                new: true
+            }
+        );
         return res.status(200).json({
             status: 200,
             content: data,
@@ -145,7 +152,12 @@ exports.delete = async function (req, res, next) {
 exports.deleteAll = async function (req, res, next) {
     const { orderId } = req.params;
     try {
-        const data = await OrderList.deleteMany({ orderId });
+        const data = await OrderList.deleteMany(
+            { orderId },
+            {
+                new: true
+            }
+        );
         return res.status(200).json({
             status: 200,
             content: data,
@@ -159,7 +171,7 @@ exports.deleteAll = async function (req, res, next) {
 exports.check = async function (req, res, next) {
     try {
         const { _id, docs } = req.body;
-        docs.forEach(async (item) => {
+        docs.forEach(async (item, index) => {
             const needQty = item.qty;
             const product = await Product.findOneAndUpdate(
                 { _id: item.product },
@@ -184,22 +196,24 @@ exports.check = async function (req, res, next) {
                 item.needQty = needQty;
                 if (item.qty === 0) {
                     item.status = statuses[statuses.length - 1];
-                }
-                item.status = statuses[statuses.length - 2];
+                } else item.status = statuses[statuses.length - 2];
             } else item.status = statuses[1];
 
-            await OrderList.findByIdAndUpdate(item._id, item);
+            await OrderList.findByIdAndUpdate(item._id, item, {
+                new: true
+            });
         });
 
-        const data = await Order.findByIdAndUpdate(_id, {
+        await Order.findByIdAndUpdate(_id, {
             ...req.body,
             status: statuses[1],
             checkedAt: new Date()
         });
+        const data = await Order.aggregate(agg({ _id }));
 
         return res.status(200).json({
             status: 200,
-            content: data,
+            content: data[0],
             message: DATA_UPDATED
         });
     } catch (e) {
@@ -210,7 +224,7 @@ exports.check = async function (req, res, next) {
 exports.disassemble = async function (req, res, next) {
     try {
         const { _id, docs } = req.body;
-        docs.forEach(async (item) => {
+        docs.forEach(async (item, index) => {
             const product = await Product.findOneAndUpdate(
                 { _id: item.product },
                 { $inc: { count: item.qty } },
@@ -221,21 +235,25 @@ exports.disassemble = async function (req, res, next) {
 
             if (item.needQty) {
                 item.qty = item.needQty;
-                item.status = statuses[0];
             }
+            item.status = statuses[0];
 
-            await OrderList.findByIdAndUpdate(item._id, item);
+            const checked = await OrderList.findByIdAndUpdate(item._id, item, {
+                new: true
+            });
+            docs[index] = checked;
         });
 
-        const data = await Order.findByIdAndUpdate(_id, {
+        await Order.findByIdAndUpdate(_id, {
             ...req.body,
             status: statuses[0],
             checkedAt: null
         });
+        const data = await Order.aggregate(agg({ _id }));
 
         return res.status(200).json({
             status: 200,
-            content: data,
+            content: data[0],
             message: DATA_UPDATED
         });
     } catch (e) {
@@ -249,10 +267,16 @@ exports.apply = async function (req, res, next) {
         const { payment } = deliveryInfo;
         const status = payment === "Acquiring" ? statuses[2] : statuses[3];
 
-        const data = await Order.findByIdAndUpdate(_id, {
-            ...req.body,
-            status
-        });
+        const data = await Order.findByIdAndUpdate(
+            _id,
+            {
+                ...req.body,
+                status
+            },
+            {
+                new: true
+            }
+        );
 
         return res.status(200).json({
             status: 200,
@@ -269,11 +293,17 @@ exports.setPay = async function (req, res, next) {
         const { _id, sumOfPay } = req.body;
         const status = statuses[3];
 
-        const data = await Order.findByIdAndUpdate(_id, {
-            ...req.body,
-            sumOfPay,
-            status
-        });
+        const data = await Order.findByIdAndUpdate(
+            _id,
+            {
+                ...req.body,
+                sumOfPay,
+                status
+            },
+            {
+                new: true
+            }
+        );
 
         return res.status(200).json({
             status: 200,

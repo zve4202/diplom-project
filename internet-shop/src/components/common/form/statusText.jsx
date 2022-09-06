@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 const statuses = {
     basket: "В корзине",
-    checked: "Проверен",
+    checked: "Подтверждён",
     needpay: "Требуется оплата",
     new: "Принят в работу",
     assembled: "Собран, готов к отправке",
@@ -11,7 +11,7 @@ const statuses = {
     sent: "Отпарвлен",
     delivered: "Доставлен",
     cancelled: "Отменён",
-    partly: "Есть частично",
+    partly: "Подтверждён частично",
     unavailable: "Недоступен"
 };
 

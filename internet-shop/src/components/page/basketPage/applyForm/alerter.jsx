@@ -89,12 +89,12 @@ class CheckAlerter extends Component {
             this;
 
         const iconInfo = <i className="bi bi-info-circle me-2" />;
-        const iconSoKondratyCame = <i className="bi bi-x-circle me-2" />;
         const iconWhatAbout = <i className="bi bi-question-circle-fill me-2" />;
         const iconExclamation = <i className="bi bi-exclamation-circle me-2" />;
         const iconExclamationHard = (
             <i className="bi bi-exclamation-circle-fill me-2" />
         );
+        const iconKirdyk = <i className="bi bi-x-circle me-2" />;
 
         if (diffDays >= 2 && diffHours > 22) {
             return (
@@ -105,23 +105,26 @@ class CheckAlerter extends Component {
                 </span>
             );
         }
-        if (diffDays >= 1 && diffHours >= 12) {
-            if (diffHours > 0) {
-                return (
-                    <span>
-                        {iconExclamation}Напоминаем! Заказ будет расформирован
-                        через 2 дня и {hoursLeft(diffHours)} если не оформите
-                        его...
-                    </span>
-                );
-            }
+
+        if (diffDays === 2) {
             return (
                 <span>
-                    {iconExclamation}Напоминаем! Заказ будет расформирован через
-                    2 дня если не поспешите оформить его...
+                    {iconExclamation}Заказ проверен и зарезервирован за вами.
+                    Пожалуйста, оформите заказ в течении 2 дней, иначе он будет
+                    расформирован...
                 </span>
             );
         }
+
+        if (diffDays === 1 && diffHours >= 12) {
+            return (
+                <span>
+                    {iconExclamation}Напоминаем! Заказ будет расформирован через
+                    1 день и {hoursLeft(diffHours)} если не оформите его...
+                </span>
+            );
+        }
+
         if (diffDays === 1) {
             if (diffHours > 0) {
                 return (
@@ -140,6 +143,7 @@ class CheckAlerter extends Component {
                 </span>
             );
         }
+
         if (diffDays === 0) {
             if (diffHours > 0) {
                 return (
@@ -161,7 +165,7 @@ class CheckAlerter extends Component {
                     </span>
                 );
             }
-            return <span>{iconSoKondratyCame}Заказ расформирован</span>;
+            return <span>{iconKirdyk}Заказ расформирован</span>;
         }
     }
 
