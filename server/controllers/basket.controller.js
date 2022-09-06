@@ -238,10 +238,9 @@ exports.disassemble = async function (req, res, next) {
             }
             item.status = statuses[0];
 
-            const checked = await OrderList.findByIdAndUpdate(item._id, item, {
+            await OrderList.findByIdAndUpdate(item._id, item, {
                 new: true
             });
-            docs[index] = checked;
         });
 
         await Order.findByIdAndUpdate(_id, {
