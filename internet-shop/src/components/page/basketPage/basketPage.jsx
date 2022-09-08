@@ -100,7 +100,6 @@ class BasketPage extends Component {
         const { step } = this.state;
         const { data, productsLoading } = this.props;
         const { products } = data;
-        console.log("render", data);
 
         return (
             <WorkScreen>

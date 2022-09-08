@@ -3,14 +3,28 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const cors = require("cors");
+const initDatabase = require("./startup/db");
+const path = require("path");
+
 const errorMiddleware = require("./middleware/error.middleware");
 
-require("./startup/db")();
+initDatabase();
 
 const app = express();
 
+if (process.env.NODE_ENV === "production") {
+    app.use("/", express.static(path.join(__dirname, "client")));
+    const indexPath = path.join(__dirname, "client", "index.html");
+    app.get("*", (req, res) => {
+        res.sendFile(indexPath);
+    });
+}
+
 const corsOptions = {
-    origin: "http://localhost:3000"
+    origin:
+        process.env.NODE_ENV === "production"
+            ? "http://localhost:8080"
+            : "http://localhost:3000"
 };
 app.use(cors(corsOptions));
 
@@ -28,7 +42,6 @@ require("./routes")(app);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-    console.log(req.body);
     next(createError(404));
 });
 
