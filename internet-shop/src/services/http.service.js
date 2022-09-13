@@ -85,10 +85,19 @@ http.interceptors.response.use(
         const { response } = error;
         const expectedErrors =
             response && response.status >= 400 && response.status < 500;
-        if (response.status === 401) {
-            toast.info("Войдите в систему!!!");
-        } else if (!expectedErrors) {
-            toast.error(response.message);
+
+        switch (response.status) {
+            case 401:
+                toast.info("Войдите в систему!!!");
+                break;
+            case 409:
+                toast.warning(response.data.message);
+                break;
+            default:
+                if (!expectedErrors) {
+                    toast.error(response.message);
+                }
+                break;
         }
         return Promise.reject(error);
     }

@@ -1,4 +1,4 @@
-const { DATA_RECEIVED } = require("../config/config");
+const { DATA_RECEIVED } = require("../config");
 const { Product_m } = require("../models");
 const Category = require("../models/Category");
 

@@ -24,6 +24,8 @@ export const validateMethods = {
     requiredIF
 };
 
+// import cardValidator from "card-validator";
+
 export function validator(testData, config) {
     const errors = {};
 
@@ -66,21 +68,6 @@ export function validator(testData, config) {
                 notValid = !regExp.test(data);
                 break;
             }
-            case isCardNumber: {
-                const regExp = /^[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}$/g;
-                notValid = !regExp.test(data);
-                break;
-            }
-            case isMonthYear: {
-                const regExp = /^[0-9]{3}$/g;
-                notValid = !regExp.test(data);
-                break;
-            }
-            case isCVC: {
-                const regExp = /^[0-9]{2}\/[0-9]{2}$/g;
-                notValid = !regExp.test(data);
-                break;
-            }
             case isIndex: {
                 const rusRegExp = /^\d{6}$/g;
                 const usRegExp = /^\d{5}[-\s]\d{4}$/g;
@@ -99,6 +86,25 @@ export function validator(testData, config) {
             }
             case isLessThan: {
                 notValid = data.length < config.value;
+                break;
+            }
+            /* CARD */
+            case isCardNumber: {
+                const regExp = /^[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}$/g;
+                notValid = !regExp.test(data);
+                // && cardValidator.number(data).isValid;
+                break;
+            }
+            case isMonthYear: {
+                const regExp = /^[0-9]{2}\/[0-9]{2}$/g;
+                notValid = !regExp.test(data);
+                // && cardValidator.expirationDate(data).isValid;
+                break;
+            }
+            case isCVC: {
+                const regExp = /^[0-9]{3}$/g;
+                notValid = !regExp.test(data);
+                //  && cardValidator.cvv(data).isValid;
                 break;
             }
             default:

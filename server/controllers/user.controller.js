@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 
-const { DATA_UPDATED, DATA_RECEIVED, salt } = require("../config/config");
+const { DATA_UPDATED, DATA_RECEIVED, salt } = require("../config");
 const Model = require("../models/User");
 const { getSort, getMatching } = require("../utils/db_utils");
 
@@ -87,17 +87,10 @@ exports.info = async function (req, res, next) {
             lastPlace: placeId,
             dataHistory: { [placeId]: { ...deliveryInfo } }
         };
-        await User.save();
-        // const data = await Model.findByIdAndUpdate(userId, user, {
-        //     new: true
-        // });
+
+        await user.save();
 
         return next();
-        // return res.status(200).json({
-        //     status: 200,
-        //     content: user,
-        //     message: DATA_UPDATED
-        // });
     } catch (e) {
         return res.status(500).json({ status: 500, message: e.message });
     }

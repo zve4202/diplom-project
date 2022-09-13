@@ -1,5 +1,5 @@
 const { Title } = require("../models");
-const { DATA_RECEIVED } = require("../config/config");
+const { DATA_RECEIVED } = require("../config");
 
 exports.getAll = async function (req, res, next) {
     try {

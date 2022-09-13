@@ -197,7 +197,7 @@ const BasketQty = ({ item, name }) => {
                     </span>
                     <StatusText status={item.status} classname="warning" />
                     <div
-                        className="btn-group btn-group-sm mt-1 w-100"
+                        className="input-group input-group-sm mt-1 w-100"
                         role="group"
                         onClick={handleToggle}
                     >

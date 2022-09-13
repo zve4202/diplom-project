@@ -1,9 +1,5 @@
 const Role = require("../models/Role");
-const {
-    DATA_RECEIVED,
-    DATA_UPDATED,
-    DATA_CREATED
-} = require("../config/config");
+const { DATA_RECEIVED, DATA_UPDATED, DATA_CREATED } = require("../config");
 
 exports.getAll = async function (req, res, next) {
     try {

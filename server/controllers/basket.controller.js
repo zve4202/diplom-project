@@ -8,7 +8,7 @@ const {
     DATA_DELETED,
     DATA_RECEIVED,
     DATA_NOT_FOUND
-} = require("../config/config");
+} = require("../config");
 
 const agg = (match) => [
     {
@@ -26,14 +26,13 @@ const agg = (match) => [
 
 exports.get = async function (req, res, next) {
     const { ip } = req;
-    const status = [statuses[0], statuses[1], statuses[2]];
+    const statusArray = [statuses[0], statuses[1], statuses[2]];
     const match = req.match
         ? req.match
-        : { userIp: ip, status: { $in: status } };
+        : { userIp: ip, status: { $in: statusArray } };
     try {
         const data = await Order.aggregate(agg(match));
         if (data.length === 0) {
-            req.match = match;
             return next();
         }
         return res.status(200).json({
@@ -49,7 +48,10 @@ exports.get = async function (req, res, next) {
 
 exports.add = async function (req, res, next) {
     try {
-        const data = await Order.create(req.match);
+        const { ip } = req;
+
+        const newdata = new Order({ userIp: ip, status: statuses[0] });
+        const data = await newdata.save();
         if (data) {
             req.match = { _id: data._id };
             return next();
@@ -107,6 +109,20 @@ exports.getItems = async function (req, res, next) {
 };
 
 exports.updateListItem = async function (req, res, next) {
+    console.log("basket updateList", req.body);
+    const order = await Order.findOne({
+        _id: req.body.orderId,
+        status: statuses[0]
+    });
+
+    if (!order) {
+        return res.status(409).json({
+            status: 409,
+            message: "Документ закрыт для добавления в него товаров"
+        });
+    }
+    console.log("basket updateList", order);
+
     try {
         let data;
         if (req.body._id) {
@@ -114,9 +130,9 @@ exports.updateListItem = async function (req, res, next) {
                 new: true
             });
         } else {
-            data = await OrderList.create(req.body, {
-                new: true
-            });
+            data = new OrderList(req.body);
+            data = await data.save();
+            console.log("basket updateList", data);
         }
         return res.status(200).json({
             status: 200,
@@ -248,6 +264,7 @@ exports.disassemble = async function (req, res, next) {
             status: statuses[0],
             checkedAt: null
         });
+
         const data = await Order.aggregate(agg({ _id }));
 
         return res.status(200).json({
@@ -266,20 +283,16 @@ exports.apply = async function (req, res, next) {
         const { payment } = deliveryInfo;
         const status = payment === "Acquiring" ? statuses[2] : statuses[3];
 
-        const data = await Order.findByIdAndUpdate(
-            _id,
-            {
-                ...req.body,
-                status
-            },
-            {
-                new: true
-            }
-        );
+        await Order.findByIdAndUpdate(_id, {
+            ...req.body,
+            status
+        });
+
+        const data = await Order.aggregate(agg({ _id }));
 
         return res.status(200).json({
             status: 200,
-            content: data,
+            content: data[0],
             message: DATA_UPDATED
         });
     } catch (e) {
@@ -292,21 +305,17 @@ exports.setPay = async function (req, res, next) {
         const { _id, sumOfPay } = req.body;
         const status = statuses[3];
 
-        const data = await Order.findByIdAndUpdate(
-            _id,
-            {
-                ...req.body,
-                sumOfPay,
-                status
-            },
-            {
-                new: true
-            }
-        );
+        await Order.findByIdAndUpdate(_id, {
+            ...req.body,
+            sumOfPay,
+            status
+        });
+
+        const data = await Order.aggregate(agg({ _id }));
 
         return res.status(200).json({
             status: 200,
-            content: data,
+            content: data[0],
             message: DATA_UPDATED
         });
     } catch (e) {

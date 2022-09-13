@@ -1,4 +1,4 @@
-FROM node:16.17.0 as client
+FROM node as client
 
 WORKDIR /app/client
 
@@ -10,7 +10,7 @@ COPY internet-shop /app/client
 
 RUN npm run build    
 
-FROM node:16.17.0
+FROM node
 
 WORKDIR /app
 

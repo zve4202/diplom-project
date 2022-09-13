@@ -1,4 +1,4 @@
-const { Order } = require("../models/Order");
+const { Order, statuses } = require("../models/Order");
 const OrderList = require("../models/OrderList");
 const Product = require("../models/Product");
 
@@ -22,8 +22,8 @@ async function disassemble(doc) {
         await OrderList.findByIdAndUpdate(item._id, item);
     });
 
-    await Order.findByIdAndUpdate(_id, {
-        ...req.body,
+    await Order.findByIdAndUpdate(doc._id, {
+        ...doc,
         status: statuses[0],
         checkedAt: null
     });

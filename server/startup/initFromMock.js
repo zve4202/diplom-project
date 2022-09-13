@@ -6,7 +6,7 @@ const models = require("../models");
 const rolesMock = require("./mockData/roles.json");
 const usersMock = require("./mockData/users.json");
 const { generateUserData } = require("../utils");
-const { salt } = require("../config/config");
+const { salt } = require("../config");
 
 async function generate(data, model) {
     return Promise.all(

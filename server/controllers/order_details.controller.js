@@ -3,7 +3,7 @@ const {
     DATA_UPDATED,
     DATA_CREATED,
     DATA_DELETED
-} = require("../config/config");
+} = require("../config");
 const { Order_dtls } = require("../models");
 
 const { createId } = require("../utils/db_utils");

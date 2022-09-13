@@ -20,84 +20,76 @@ class BasketPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            step: "show"
+            todo: "nothing"
         };
         this.handleReload = this.handleReload.bind(this);
-        this.setCurrStep = this.setCurrStep.bind(this);
-        this.setStepName = this.setStepName.bind(this);
         this.handleCheckAndPay = this.handleCheckAndPay.bind(this);
     }
 
-    setCurrStep() {
-        const { data } = this.props;
-        let step = "show";
-        switch (data.status) {
-            case "basket":
-                break;
-            case "checked":
-                step = "check";
-                break;
-            case "needpay":
-                step = "needpay";
-                break;
-            default:
-                step = "undoCheck";
-                break;
-        }
-        this.setStepName(step);
+    componentDidMount() {
         this.handleReload();
     }
 
-    setStepName(step) {
-        this.setState((state) => ({ ...state, step }));
-    }
-
-    componentDidMount() {
-        this.setCurrStep();
-    }
-
     handleCheckAndPay(todo) {
-        this.setStepName(todo);
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        const { step } = this.state;
         const { data, checkBasket, applyBasket, payOrder } = this.props;
         const { status } = data;
+        this.setState({ todo });
         try {
-            if (step !== prevState.step) {
-                if (status === "basket" && step === "check") {
-                    checkBasket();
-                } else if (status === "checked") {
-                    if (step === "apply") {
-                        applyBasket();
+            switch (status) {
+                case "basket": {
+                    if (todo === "check") {
+                        checkBasket();
+                        this.setState({ todo: "nothing" });
                     }
-                } else if (status === "needpay" && step === "topay") {
-                    payOrder();
+                    return;
                 }
+                case "checked": {
+                    if (todo === "apply") {
+                        applyBasket();
+                        this.setState({ todo: "nothing" });
+                    }
+                    return;
+                }
+                case "needpay": {
+                    if (todo === "topay") {
+                        payOrder();
+                        this.setState({ todo: "nothing" });
+                    }
+                    return;
+                }
+                default:
+                    this.setState({ todo: "nothing" });
+                    break;
             }
         } catch (error) {
             console.log(error);
         }
+    }
 
-        if (status !== prevProps.data.status) {
+    componentDidUpdate(prevProps, prevState) {
+        if (this.props.data.status !== prevProps.data.status) {
             setTimeout(() => {
                 this.handleReload();
             }, [250]);
         }
     }
 
-    componentWillUnmount() {}
+    componentWillUnmount() {
+        this.setState({ todo: "nothing" });
+    }
 
     handleReload() {
         const { data, loadBasketItems } = this.props;
         if (data._id) {
-            loadBasketItems(data._id);
+            try {
+                loadBasketItems(data._id);
+            } catch (error) {
+                console.log(error);
+            }
         }
     }
 
     render() {
-        const { step } = this.state;
         const { data, productsLoading } = this.props;
         const { products } = data;
 
@@ -105,11 +97,10 @@ class BasketPage extends Component {
             <WorkScreen>
                 <BasketSidebar
                     menu={menu}
-                    step={step}
                     onCheckAndPay={this.handleCheckAndPay}
                 />
                 <ContentWrapper menu={menu.caption}>
-                    <ApplyForm step={step} />
+                    <ApplyForm todo={this.state.todo} />
                     <BasketTable
                         name={menu.name}
                         data={products || []}

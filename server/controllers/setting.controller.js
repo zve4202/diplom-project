@@ -1,9 +1,5 @@
 const Setting = require("../models/Setting");
-const {
-    DATA_RECEIVED,
-    DATA_UPDATED,
-    DATA_CREATED
-} = require("../config/config");
+const { DATA_RECEIVED, DATA_UPDATED, DATA_CREATED } = require("../config");
 
 exports.get = async function (req, res, next) {
     const { id } = req.params;

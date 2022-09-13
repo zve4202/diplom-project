@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, createRef } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
@@ -34,6 +34,7 @@ const validatorConfig = {
 };
 
 class PayForm extends Component {
+    refCard;
     constructor(props) {
         super(props);
         const { deliveryInfo } = this.props.data;
@@ -43,9 +44,9 @@ class PayForm extends Component {
             errors: {}
         };
         this.isValid = false;
-
-        this.applyRefs = React.createRef();
+        this.refCard = createRef();
         this.handleCange = this.handleCange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     handleCange({ name, value }) {
@@ -57,7 +58,11 @@ class PayForm extends Component {
     }
 
     componentDidMount() {
-        this.validate();
+        const { data } = this.props;
+        if (data.status !== "needpay") return;
+
+        this.isValid = this.validate();
+        this.refCard.current.focus();
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -116,7 +121,8 @@ class PayForm extends Component {
                                     onChange: this.handleCange,
                                     error: errors.cardNumber,
                                     placeholder: "0000 0000 0000 0000",
-                                    title: "Номер кредитной карты"
+                                    title: "Номер кредитной карты",
+                                    ref: this.refCard
                                 }}
                             />
                         </div>
@@ -143,7 +149,7 @@ class PayForm extends Component {
                                         name: "cvcCode",
                                         value: creditCard.cvcCode,
                                         onChange: this.handleCange,
-                                        error: errors.dateEnd,
+                                        error: errors.cvcCode,
                                         placeholder: "CVC код",
                                         title: "CVV/CVC код"
                                     }}

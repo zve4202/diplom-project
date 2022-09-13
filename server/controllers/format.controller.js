@@ -3,7 +3,7 @@ const {
     DATA_UPDATED,
     DATA_CREATED,
     DATA_DELETED
-} = require("../config/config");
+} = require("../config");
 const Format = require("../models/Format");
 
 exports.getAll = async function (req, res, next) {

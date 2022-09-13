@@ -3,30 +3,28 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const cors = require("cors");
-const initDatabase = require("./startup/db");
 const path = require("path");
 
 const errorMiddleware = require("./middleware/error.middleware");
 
-initDatabase();
+require("./startup/db")();
 
 const app = express();
 
 if (process.env.NODE_ENV === "production") {
-    app.use("/", express.static(path.join(__dirname, "client")));
-    const indexPath = path.join(__dirname, "client", "index.html");
+    const clientPath = path.join(__dirname, "client");
+    app.use("/", express.static(clientPath));
+    const indexPath = path.join(clientPath, "index.html");
     app.get("*", (req, res) => {
         res.sendFile(indexPath);
     });
+    app.use(cors());
+} else {
+    const corsOptions = {
+        origin: "http://localhost:3000"
+    };
+    app.use(cors(corsOptions));
 }
-
-const corsOptions = {
-    origin:
-        process.env.NODE_ENV === "production"
-            ? "http://localhost:8080"
-            : "http://localhost:3000"
-};
-app.use(cors(corsOptions));
 
 app.use(logger("common"));
 
@@ -35,6 +33,7 @@ app.use(express.json({ limit: maxRequestBodySize }));
 app.use(express.urlencoded({ extended: false, limit: maxRequestBodySize }));
 
 app.use(cookieParser());
+
 app.use("/index", (req, res, next) => {
     res.status(200).send({ message: "Server is up", status: 200 });
 }); // test route

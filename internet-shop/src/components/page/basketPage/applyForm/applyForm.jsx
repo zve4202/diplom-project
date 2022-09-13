@@ -253,18 +253,19 @@ class ApplyForm extends Component {
     }
 
     render() {
-        const { step, data } = this.props;
+        const { todo, data } = this.props;
+
         if (data.status === "basket") return null;
 
         return (
             <div className="px-0">
-                {step === "check" && data.status === "basket" && (
+                {todo === "check" && data.status === "basket" && (
                     <div className="form-control bg-success bg-opacity-10 text-md-center text-success">
                         <span className="spinner-border spinner-border-sm  me-2" />
                         Корзина на проверке...
                     </div>
                 )}
-                {step === "apply" && (
+                {todo === "apply" && (
                     <div className="form-control bg-success bg-opacity-10 text-md-center text-success">
                         <span className="spinner-border spinner-border-sm  me-2" />
                         Заказ в обработке...
@@ -291,7 +292,7 @@ class ApplyForm extends Component {
 
 ApplyForm.propTypes = {
     data: PropTypes.object,
-    step: PropTypes.string.isRequired,
+    todo: PropTypes.string.isRequired,
     authUser: PropTypes.object,
     updateDlvInfo: PropTypes.func
 };

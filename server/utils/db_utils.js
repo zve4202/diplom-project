@@ -1,4 +1,4 @@
-// const conf = require("../config/config.db");
+// const conf = require("../config.db");
 // const gen = require("mongo-incremental-id-generator")(conf.connection_string);
 
 const Sequences = require("../models/Sequence");

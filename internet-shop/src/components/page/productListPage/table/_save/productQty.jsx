@@ -8,13 +8,13 @@ import {
     getBasketQty,
     removeBasket,
     removeBasketItem
-} from "../../../../store/basket";
+} from "../../../../../store/basket";
 import {
     addReminder,
     getReminder,
     removeReminder,
     updateReminder
-} from "../../../../store/reminders";
+} from "../../../../../store/reminders";
 
 const ProductQty = ({ data, name }) => {
     const { title, priceRub, count } = data;
@@ -71,6 +71,7 @@ const ProductQty = ({ data, name }) => {
 
     function updateOnServer(numQty) {
         if (savedQty === numQty) return;
+        console.log("updateOnServer", savedQty, numQty);
 
         if (numQty === 0) {
             if (name === "product") {

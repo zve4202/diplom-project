@@ -1,16 +1,13 @@
 const mongoose = require("mongoose");
 const debug = require("debug")("server:db");
 const chalk = require("chalk");
-const { dbConfig } = require("../config");
+const { connectionString } = require("../config");
 
 const initFromMock = require("./initFromMock");
 const initFromXml = require("./initFromXml");
 
 module.exports = function () {
-    mongoose.connect(
-        dbConfig.connection_string
-        // `mongodb://${dbConfig.host}:${dbConfig.port}/${dbConfig.db}`
-    );
+    mongoose.connect(connectionString);
 
     const db = mongoose.connection;
 
@@ -19,10 +16,12 @@ module.exports = function () {
         console.error.bind(console, `${chalk.red("x")} connection error:`)
     );
 
-    db.once("open", async function () {
-        debug(`MongoDB status: Connected ${chalk.green("✓")}`);
-        await initFromMock();
-        await initFromXml();
-        debug(`Data loaded ${chalk.green("✓")}`);
-    });
+    if (process.env.NODE_ENV !== "production") {
+        db.once("open", async function () {
+            debug(`MongoDB status: Connected ${chalk.green("✓")}`);
+            await initFromMock();
+            await initFromXml();
+            debug(`Data loaded ${chalk.green("✓")}`);
+        });
+    }
 };

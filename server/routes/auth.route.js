@@ -64,6 +64,8 @@ router.post("/signIn", [
     async (req, res) => {
         try {
             const errors = validationResult(req);
+            console.log(errors);
+
             if (!errors.isEmpty()) {
                 return res.status(400).json({
                     error: {
@@ -108,7 +110,6 @@ router.post("/signIn", [
 
             res.status(200).send({ ...tokens, content: existingUser });
         } catch (e) {
-            // console.log(e);
             res.status(500).json({
                 message: e.message
             });

@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import ProductPicture from "../../../ui/productPicture";
 
 import { useHistory } from "react-router-dom";
-import ProductQty from "../table/productQty";
+import ProductQty from "../table/_save/productQty";
 import ProductMenuBasket from "./productMenuBasket";
 
 const ProductCard = ({ product }) => {

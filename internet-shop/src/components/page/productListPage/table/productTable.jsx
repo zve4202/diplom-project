@@ -6,7 +6,7 @@ import ProductName from "./productName";
 import ProductPicture from "./productPicture";
 import Barcode from "../../../ui/barcode";
 import ProductPrice from "./productPrice";
-import ProductQty from "./productQty";
+import QuantityReminder from "../../../ui/poductQty/index";
 
 const ProductTable = ({
     name,
@@ -45,7 +45,7 @@ const ProductTable = ({
             caption: "Корзина",
             name: "add",
             width: 190,
-            component: (item) => <ProductQty data={getData(item)} name={name} />
+            component: (item) => <QuantityReminder data={getData(item)} />
         },
         {
             caption: "Цена",

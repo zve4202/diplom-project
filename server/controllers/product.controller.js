@@ -6,7 +6,7 @@ const {
     DATA_UPDATED,
     DATA_RECEIVED,
     DATA_DELETED
-} = require("../config/config");
+} = require("../config");
 
 const searchMap = {
     category: { field: "title.format.category", number: true },

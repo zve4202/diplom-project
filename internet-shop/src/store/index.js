@@ -30,15 +30,19 @@ const rootReducer = combineReducers({
 });
 
 function createStore() {
-    return configureStore({
-        reducer: rootReducer,
-        middleware: (getDefaultMiddleware) => {
-            if (process.env.NODE_ENV !== "production") {
-                getDefaultMiddleware().concat(logger);
-            }
-        },
-        devTools: process.env.NODE_ENV !== "production"
-    });
+    if (process.env.NODE_ENV !== "production") {
+        return configureStore({
+            reducer: rootReducer,
+            middleware: (getDefaultMiddleware) =>
+                getDefaultMiddleware().concat(logger),
+            devTools: true
+        });
+    } else {
+        return configureStore({
+            reducer: rootReducer,
+            devTools: false
+        });
+    }
 }
 
 export default createStore;

@@ -6,7 +6,7 @@ import classNames from "classnames";
 import { yesNo } from "../../../dialogs/messageDialog";
 import { acquiring } from "./applyForm/payments";
 
-const ApplyBasketButton = ({ step, onAccept }) => {
+const ApplyBasketButton = ({ onAccept }) => {
     const data = useSelector((state) => state.basket.data);
     const { status, deliveryInfo } = data;
     if (status === "needpay") return null;
@@ -29,7 +29,7 @@ const ApplyBasketButton = ({ step, onAccept }) => {
             ? "Перейти к оплате покупки"
             : "Завершить оформление";
 
-    const isDisabled = !(step === "basket" || deliveryInfo?.isValid);
+    const isDisabled = !(status === "basket" || deliveryInfo?.isValid);
 
     const todo =
         status === "basket"
@@ -67,7 +67,6 @@ const ApplyBasketButton = ({ step, onAccept }) => {
 };
 
 ApplyBasketButton.propTypes = {
-    step: PropTypes.string.isRequired,
     onAccept: PropTypes.func.isRequired
 };
 

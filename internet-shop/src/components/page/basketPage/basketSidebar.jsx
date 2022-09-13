@@ -14,7 +14,7 @@ import ApplyBasketButton from "./applyBasketButton";
 import BasketTotals from "./basketTotals";
 import PayForm from "./payForm/payForm";
 
-const BasketSidebar = ({ menu, step, onCheckAndPay }) => {
+const BasketSidebar = ({ menu, onCheckAndPay }) => {
     const basket = useSelector(getBasket());
     const dispatch = useDispatch();
 
@@ -34,28 +34,10 @@ const BasketSidebar = ({ menu, step, onCheckAndPay }) => {
         }
     };
 
-    // const onItemSelect = (item) => {
-    //     switch (item.path) {
-    //         case names.clear:
-    //             yesNo("Вы действительно желаете очистить вашу корзину?", handleUndoBasket);
-    //             break;
-    //         case names.goto:
-    // yesNo(
-    //     "Вы действительно желаете отправить корзину на проверку, и перейти к оплате?",
-    //     handleCheckAndPay
-    // );
-    // break;
-    //         default:
-    //             break;
-    //     }
-    // };
-
     return (
         <SideBarWrapper
             {...{
                 menu,
-                // onItemSelect,
-                // menuAfterChildren: true,
                 backBtn: <BackButton to="/" tooltip="Вернуться к покупкам" />
             }}
         >
@@ -66,7 +48,7 @@ const BasketSidebar = ({ menu, step, onCheckAndPay }) => {
                         status={basket.status}
                         onAccept={handleUndoBasket}
                     />
-                    <ApplyBasketButton step={step} onAccept={onCheckAndPay} />
+                    <ApplyBasketButton onAccept={onCheckAndPay} />
                     <PayForm className="mt-3" />
                 </div>
             )}
@@ -75,7 +57,6 @@ const BasketSidebar = ({ menu, step, onCheckAndPay }) => {
 };
 
 BasketSidebar.propTypes = {
-    step: PropTypes.string.isRequired,
     menu: PropTypes.object.isRequired,
     onCheckAndPay: PropTypes.func.isRequired
 };
