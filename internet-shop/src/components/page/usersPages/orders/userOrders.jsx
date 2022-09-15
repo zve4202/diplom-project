@@ -1,7 +1,8 @@
-import classNames from "classnames";
 import React from "react";
+import classNames from "classnames";
 import { useDispatch, useSelector } from "react-redux";
 import { updateSetting } from "../../../../store/setting";
+import OrderList from "./orderList";
 
 const UserOrders = () => {
     const dispatch = useDispatch();
@@ -20,38 +21,37 @@ const UserOrders = () => {
     };
 
     return (
-        // <div className="card">
-        //     <div className="card-body">
-        <div className="nav nav-tabs">
-            <div className="nav-item">
-                <span
-                    className={classNames({
-                        "nav-link": true,
-                        active: selectedTab === "current"
-                    })}
-                    aria-current="page"
-                    onClick={() => onItemSelect("current")}
-                    role="button"
-                >
-                    Текущие
-                </span>
+        <div>
+            <div className="nav nav-tabs">
+                <div className="nav-item">
+                    <span
+                        className={classNames({
+                            "nav-link": true,
+                            active: selectedTab === "current"
+                        })}
+                        aria-current="page"
+                        onClick={() => onItemSelect("current")}
+                        role="button"
+                    >
+                        Текущие
+                    </span>
+                </div>
+                <div className="nav-item">
+                    <span
+                        className={classNames({
+                            "nav-link": true,
+                            active: selectedTab === "archive"
+                        })}
+                        aria-current="page"
+                        onClick={() => onItemSelect("archive")}
+                        role="button"
+                    >
+                        Архив
+                    </span>
+                </div>
             </div>
-            <div className="nav-item">
-                <span
-                    className={classNames({
-                        "nav-link": true,
-                        active: selectedTab === "archive"
-                    })}
-                    aria-current="page"
-                    onClick={() => onItemSelect("archive")}
-                    role="button"
-                >
-                    Архив
-                </span>
-            </div>
+            <OrderList selected={selectedTab} />
         </div>
-        //     </div>
-        // </div>
     );
 };
 

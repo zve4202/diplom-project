@@ -127,6 +127,29 @@ export const getAuth = () => (state) => ({
     authUser: state.auth.authUser,
     isAdmin: state.auth.isAdmin
 });
+
+export const getPlaceOptions = () => (state) => {
+    const options = [];
+    if (state.auth.authUser) {
+        const { dataHistory } = state.auth.authUser.deliveryPlaces;
+        Object.keys(dataHistory).forEach((data) => {
+            options.push({
+                value: data,
+                label: data
+            });
+        });
+    }
+    return options;
+};
+
+export const getPlaceData = () => (state) => {
+    if (state.auth.authUser) {
+        const { dataHistory } = state.auth.authUser.deliveryPlaces;
+        return dataHistory;
+    }
+    return null;
+};
+
 export const getAuthLoading = () => (state) => state.auth.isLoading;
 export const getAuthError = () => (state) => state.auth.error;
 

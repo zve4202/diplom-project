@@ -1,9 +1,16 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { yesNo } from "../../../dialogs/messageDialog";
+import { useSelector } from "react-redux";
 
-const UndoBasketButton = ({ status, onAccept }) => {
+const UndoBasketButton = ({ onAccept }) => {
+    const { data, saveInfo } = useSelector((state) => state.basket);
+    const { status, deliveryInfo } = data;
+
     if (!["basket", "checked"].includes(status)) return null;
+    const isDisabled = saveInfo || !deliveryInfo?.isValid;
+    if (isDisabled) return null;
+
     const question =
         status === "basket"
             ? "Вы действительно желаете очистить вашу корзину?"
@@ -35,7 +42,6 @@ const UndoBasketButton = ({ status, onAccept }) => {
 };
 
 UndoBasketButton.propTypes = {
-    status: PropTypes.string.isRequired,
     onAccept: PropTypes.func.isRequired
 };
 

@@ -27,6 +27,14 @@ export const createGroups = (data) => {
 export const validatorConfig = {};
 export const defaultData = {};
 
+export const getDefaults = () => {
+    const result = {};
+    Object.keys(defMap).forEach((key) => {
+        result[key] = valueOfName(key);
+    });
+    return result;
+};
+
 export const createDefaults = () => {
     if (Object.keys(defaultData).length > 0) return;
     Object.keys(defMap).forEach((key) => {

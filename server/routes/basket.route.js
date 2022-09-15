@@ -11,7 +11,8 @@ router.put("/", Controller.updateListItem);
 
 router.delete("/:id", Controller.delete);
 router.delete("/all/:orderId", Controller.deleteAll);
-router.put("/check", [auth], Controller.check);
+router.put("/info", [auth], UserController.info, Controller.info);
+router.put("/check", [auth], UserController.getInfo, Controller.check);
 router.put("/apply", [auth], UserController.info, Controller.apply);
 router.put("/topay", [auth], Controller.setPay);
 router.put("/disassemble", [auth], Controller.disassemble);

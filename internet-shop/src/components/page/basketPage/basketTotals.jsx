@@ -32,6 +32,8 @@ const BasketTotals = ({ basket }) => {
         );
     };
 
+    if (status === "new") return null;
+
     return (
         <div className="card">
             <div className="card-header">

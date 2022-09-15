@@ -7,9 +7,14 @@ import { yesNo } from "../../../dialogs/messageDialog";
 import { acquiring } from "./applyForm/payments";
 
 const ApplyBasketButton = ({ onAccept }) => {
-    const data = useSelector((state) => state.basket.data);
+    const { data, saveInfo } = useSelector((state) => state.basket);
     const { status, deliveryInfo } = data;
-    if (status === "needpay") return null;
+
+    if (["needpay", "new"].includes(status)) return null;
+
+    const isDisabled =
+        saveInfo || !(status === "basket" || deliveryInfo?.isValid);
+    if (isDisabled) return null;
 
     const question =
         "Вы действительно желаете отправить корзину на проверку, и перейти к оформлению и оплате?";
@@ -28,8 +33,6 @@ const ApplyBasketButton = ({ onAccept }) => {
             : deliveryInfo.payment === acquiring.value
             ? "Перейти к оплате покупки"
             : "Завершить оформление";
-
-    const isDisabled = !(status === "basket" || deliveryInfo?.isValid);
 
     const todo =
         status === "basket"
@@ -51,7 +54,6 @@ const ApplyBasketButton = ({ onAccept }) => {
                     }
                 }}
                 title={tooltip}
-                disabled={isDisabled}
             >
                 <i
                     className={classNames({

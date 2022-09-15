@@ -43,7 +43,8 @@ const schema = new Schema(
                 isValid: false
             }
         },
-
+        totalQty: { type: Number, default: 0 },
+        totalPrice: { type: Number, default: 0 },
         sumOfPay: { type: Number, default: 0 },
         checkedAt: { type: Date }
     },

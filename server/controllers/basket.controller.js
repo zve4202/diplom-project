@@ -41,7 +41,6 @@ exports.get = async function (req, res, next) {
             message: DATA_RECEIVED
         });
     } catch (e) {
-        console.log("basket e", e.message);
         return res.status(500).json({ status: 500, message: e.message });
     }
 };
@@ -109,7 +108,6 @@ exports.getItems = async function (req, res, next) {
 };
 
 exports.updateListItem = async function (req, res, next) {
-    console.log("basket updateList", req.body);
     const order = await Order.findOne({
         _id: req.body.orderId,
         status: statuses[0]
@@ -121,7 +119,6 @@ exports.updateListItem = async function (req, res, next) {
             message: "Документ закрыт для добавления в него товаров"
         });
     }
-    console.log("basket updateList", order);
 
     try {
         let data;
@@ -132,7 +129,6 @@ exports.updateListItem = async function (req, res, next) {
         } else {
             data = new OrderList(req.body);
             data = await data.save();
-            console.log("basket updateList", data);
         }
         return res.status(200).json({
             status: 200,
@@ -140,8 +136,6 @@ exports.updateListItem = async function (req, res, next) {
             message: DATA_UPDATED
         });
     } catch (e) {
-        console.log("basket updateList error", e.message);
-
         return res.status(500).json({ status: 500, message: e.message });
     }
 };
@@ -316,6 +310,24 @@ exports.setPay = async function (req, res, next) {
         return res.status(200).json({
             status: 200,
             content: data[0],
+            message: DATA_UPDATED
+        });
+    } catch (e) {
+        return res.status(500).json({ status: 500, message: e.message });
+    }
+};
+
+exports.info = async function (req, res, next) {
+    try {
+        const { _id, deliveryInfo } = req.body;
+
+        await Order.findByIdAndUpdate(_id, {
+            deliveryInfo
+        });
+
+        return res.status(200).json({
+            status: 200,
+            content: deliveryInfo,
             message: DATA_UPDATED
         });
     } catch (e) {

@@ -14,6 +14,10 @@ const basketService = {
         const { data } = await httpService.put(endpoint, content);
         return data;
     },
+    updateInfo: async (content) => {
+        const { data } = await httpService.put(endpoint + "info/", content);
+        return data;
+    },
     delete: async (id) => {
         const { data } = await httpService.delete(endpoint + id);
         return data;

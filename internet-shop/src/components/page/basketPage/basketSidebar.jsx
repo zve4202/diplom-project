@@ -44,10 +44,7 @@ const BasketSidebar = ({ menu, onCheckAndPay }) => {
             {basket.totalQty > 0 && (
                 <div>
                     <BasketTotals basket={basket} />
-                    <UndoBasketButton
-                        status={basket.status}
-                        onAccept={handleUndoBasket}
-                    />
+                    <UndoBasketButton onAccept={handleUndoBasket} />
                     <ApplyBasketButton onAccept={onCheckAndPay} />
                     <PayForm className="mt-3" />
                 </div>

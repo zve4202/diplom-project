@@ -83,13 +83,30 @@ exports.info = async function (req, res, next) {
     const { placeId } = deliveryInfo;
     try {
         const user = await Model.findById(userId);
+        const { dataHistory } = user.deliveryPlaces;
+
         user.deliveryPlaces = {
             lastPlace: placeId,
-            dataHistory: { [placeId]: { ...deliveryInfo } }
+            dataHistory: { ...dataHistory, [placeId]: { ...deliveryInfo } }
         };
 
         await user.save();
 
+        return next();
+    } catch (e) {
+        return res.status(500).json({ status: 500, message: e.message });
+    }
+};
+
+exports.getInfo = async function (req, res, next) {
+    const { userId } = req.body;
+    try {
+        const user = await Model.findById(userId);
+        const { lastPlace, dataHistory } = user.deliveryPlaces;
+        if (dataHistory) {
+            req.deliveryInfo = dataHistory[lastPlace];
+            console.log(req.deliveryInfo);
+        }
         return next();
     } catch (e) {
         return res.status(500).json({ status: 500, message: e.message });

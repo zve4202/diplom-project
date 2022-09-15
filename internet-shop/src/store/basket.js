@@ -13,8 +13,11 @@ const initialState = {
         docs: [],
         products: [],
         totalQty: 0,
-        totalPrice: 0
+        totalPrice: 0,
+        sumOfPay: 0,
+        checkedAt: null
     },
+    saveInfo: undefined,
     docsLoading: true,
     productsLoading: false,
     error: null
@@ -44,6 +47,7 @@ const basketSlice = createSlice({
                 state.data = { ...action.payload, ...totals };
             }
             state.docsLoading = false;
+            state.saveInfo = null;
         },
         requestedItems(state) {
             state.productsLoading = true;
@@ -93,10 +97,27 @@ const basketSlice = createSlice({
             state.docsLoading = false;
         },
         updateInfo(state, action) {
-            state.data.deliveryInfo = action.payload;
+            const deliveryInfo = { ...action.payload };
+            const { clearSaves } = deliveryInfo;
+            if (clearSaves) {
+                delete deliveryInfo.clearSaves;
+                state.saveInfo = undefined;
+            } else if (!state.saveInfo) {
+                const { deliveryInfo: saveInfo } = state.data;
+                state.saveInfo = { ...saveInfo };
+            }
+            state.data.deliveryInfo = deliveryInfo;
+        },
+        resetInfo(state, action) {
+            const { saveInfo } = state;
+            if (saveInfo) {
+                state.data.deliveryInfo = { ...saveInfo };
+                state.saveInfo = undefined;
+            }
         },
         requestFailed(state, action) {
             state.docsLoading = false;
+            state.productsLoading = false;
             state.error = action.payload;
         }
     }
@@ -106,6 +127,7 @@ const { actions, reducer: basketReducer } = basketSlice;
 const {
     update,
     updateInfo,
+    resetInfo,
     remove,
     clear,
     resived,
@@ -127,6 +149,25 @@ export const loadBasket = () => async (dispatch) => {
 
 export const updateDlvInfo = (deliveryInfo) => async (dispatch, getState) => {
     dispatch(updateInfo(deliveryInfo));
+};
+
+export const resetDlvInfo = () => async (dispatch, getState) => {
+    dispatch(resetInfo());
+};
+
+export const saveDlvInfo = () => async (dispatch, getState) => {
+    try {
+        const { _id, userId, deliveryInfo } = getState().basket.data;
+        dispatch(requested());
+        const { content } = await Service.updateInfo({
+            _id,
+            userId,
+            deliveryInfo
+        });
+        dispatch(updateInfo({ ...content, clearSaves: true }));
+    } catch (error) {
+        dispatch(requestFailed(error.message));
+    }
 };
 
 export const loadBasketItems = (id) => async (dispatch, getState) => {
@@ -151,7 +192,6 @@ export const updateBasket = (payload) => async (dispatch, getState) => {
                 qty: payload.qty,
                 price: payload.price
             });
-            console.log("add basket old content", content);
             dispatch(update(content));
         } else {
             const { content } = await Service.update({
@@ -255,7 +295,7 @@ export const applyBasket = () => async (dispatch, getState) => {
     }
 };
 
-export const payOrder = (sumOfPay) => async (dispatch, getState) => {
+export const payOrder = () => async (dispatch, getState) => {
     const authUser = getState().auth.authUser;
     if (!authUser) {
         history.push({
@@ -269,13 +309,21 @@ export const payOrder = (sumOfPay) => async (dispatch, getState) => {
         return;
     }
     const { data } = getState().basket;
-
-    const basketData = { ...data, sumOfPay, userId: authUser._id };
+    const { deliveryInfo, totalPrice } = data;
+    const { deliveryPrice } = getDeliveryBy(deliveryInfo.delivery);
+    const basketData = {
+        ...data,
+        sumOfPay: totalPrice + deliveryPrice,
+        userId: authUser._id
+    };
 
     try {
         dispatch(requested());
         const { content } = await Service.topay(basketData);
         dispatch(resived(content));
+        setTimeout(() => {
+            dispatch(loadBasket());
+        }, [5000]);
     } catch (error) {
         dispatch(requestFailed(error.message));
     }
@@ -314,6 +362,7 @@ export const getBasketQty = (id) => (state) => {
     }
     return null;
 };
+
 export const getTotals = () => (state) => {
     const { deliveryInfo, totalQty, totalPrice } = state.basket.data;
     if (!deliveryInfo) {

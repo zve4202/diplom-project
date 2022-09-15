@@ -4,12 +4,13 @@ import PropTypes from "prop-types";
 
 import payments from "./payments";
 import deliveries from "./deliveries";
-import { updateDlvInfo } from "../../../../store/basket";
+import { updateDlvInfo, saveDlvInfo } from "../../../../store/basket";
 import fieldsMap from "./applyMap";
 import {
     createDefaults,
     createGroups,
     defaultData,
+    getDefaults,
     validatorConfig
 } from "./utils";
 import { validator } from "../../../../utils/validator";
@@ -43,7 +44,7 @@ class ApplyForm extends Component {
 
     componentDidUpdate(prevProps, prevState) {
         const { persone } = this.state.deliveryInfo;
-        const { authUser } = this.props;
+        const { authUser, data } = this.props;
         const currName = authUser?.name || "";
         const prevName = prevProps.authUser?.name || "";
         if (currName !== prevName) {
@@ -55,6 +56,16 @@ class ApplyForm extends Component {
             }
         }
 
+        if (
+            JSON.stringify(data.deliveryInfo) !==
+            JSON.stringify(prevProps.data.deliveryInfo)
+        ) {
+            const deliveryInfo = { ...data.deliveryInfo };
+            this.setState((prevState) => ({
+                ...prevState,
+                deliveryInfo
+            }));
+        }
         if (
             JSON.stringify(this.state.deliveryInfo) !==
             JSON.stringify(prevState.deliveryInfo)
@@ -74,8 +85,25 @@ class ApplyForm extends Component {
     }
 
     handleCange({ name, value }) {
-        const deliveryInfo = { ...this.state.deliveryInfo, [name]: value };
+        let deliveryInfo = { ...this.state.deliveryInfo, [name]: value };
+        // console.log("handleCange", deliveryInfo);
+
         switch (name) {
+            case "placeId": {
+                if (value === "ADD_NEW") {
+                    deliveryInfo = getDefaults();
+                } else {
+                    const { authUser } = this.props;
+                    if (authUser) {
+                        const { dataHistory } = authUser.deliveryPlaces;
+                        if (dataHistory) {
+                            deliveryInfo = { ...dataHistory[value] };
+                        }
+                    }
+                }
+                break;
+            }
+
             case "delivery":
                 switch (value) {
                     case deliveries.byRussianPost.value:
@@ -255,7 +283,18 @@ class ApplyForm extends Component {
     render() {
         const { todo, data } = this.props;
 
-        if (data.status === "basket") return null;
+        if (!["checked", "needpay"].includes(data.status)) {
+            if (data.status === "new") {
+                return (
+                    <div className="px-0">
+                        <div className="form-control bg-success bg-opacity-10 text-md-center text-success">
+                            <span className="spinner-grow spinner-grow-sm me-2" />
+                            Заказ принят...
+                        </div>
+                    </div>
+                );
+            } else return null;
+        }
 
         return (
             <div className="px-0">
@@ -307,7 +346,8 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-    updateDlvInfo
+    updateDlvInfo,
+    saveDlvInfo
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ApplyForm);
