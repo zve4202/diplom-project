@@ -1,5 +1,5 @@
 export function displayDate(data) {
-    const date = new Date(parseInt(data));
+    const date = new Date(data);
     const dateNow = new Date();
     const yearDif = dateNow.getFullYear() - date.getFullYear();
     if (yearDif === 0) {
@@ -16,7 +16,10 @@ export function displayDate(data) {
                 }
                 return "30 минут назад";
             }
-            return `${date.getHours()}:${date.getMinutes()}`;
+            const hours = String(date.getHours()).padStart(2, "0");
+
+            const minutes = String(date.getMinutes()).padStart(2, "0");
+            return `${hours}:${minutes}`;
         }
 
         return `${date.getDate()} ${date.toLocaleString("default", {

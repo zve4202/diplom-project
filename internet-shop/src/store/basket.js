@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getDeliveryBy } from "../components/page/basketPage/applyForm/deliveries";
+import { getDeliveryBy } from "../components/page/deliveries";
 
 import Service from "../services/basket.service";
 import history from "../utils/history";
@@ -271,7 +271,6 @@ export const checkBasket = () => async (dispatch, getState) => {
 };
 
 export const applyBasket = () => async (dispatch, getState) => {
-    const { data } = getState().basket;
     const authUser = getState().auth.authUser;
     if (!authUser) {
         history.push({
@@ -284,7 +283,15 @@ export const applyBasket = () => async (dispatch, getState) => {
         });
         return;
     }
-    const basketData = { ...data, userId: authUser._id };
+
+    const { data } = getState().basket;
+    const { deliveryPrice } = getDeliveryBy(data.deliveryInfo.delivery);
+
+    const basketData = {
+        ...data,
+        deliveryPrice,
+        userId: authUser._id
+    };
 
     try {
         dispatch(requested());
@@ -313,6 +320,7 @@ export const payOrder = () => async (dispatch, getState) => {
     const { deliveryPrice } = getDeliveryBy(deliveryInfo.delivery);
     const basketData = {
         ...data,
+        deliveryPrice,
         sumOfPay: totalPrice + deliveryPrice,
         userId: authUser._id
     };

@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import classNames from "classnames";
 
 import { yesNo } from "../../../dialogs/messageDialog";
-import { acquiring } from "./applyForm/payments";
+import { acquiring } from "../payments";
 
 const ApplyBasketButton = ({ onAccept }) => {
     const { data, saveInfo } = useSelector((state) => state.basket);

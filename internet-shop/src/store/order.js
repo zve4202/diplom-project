@@ -65,20 +65,20 @@ const {
 } = actions;
 
 // types = current, archive
-export const loadOrder = (type) => async (dispatch) => {
+export const loadOrder = (type, userId) => async (dispatch) => {
     dispatch(requested());
     try {
-        const { content } = await Service.get(type);
+        const { content } = await Service.get(type, userId);
         dispatch(resived(content));
     } catch (error) {
         dispatch(requestFailed(error.message));
     }
 };
 
-export const loadOrderItems = (type) => async (dispatch, getState) => {
+export const loadOrderItems = (type, userId) => async (dispatch, getState) => {
     try {
         dispatch(requestedItems());
-        const { content } = await Service.getItems(type);
+        const { content } = await Service.getItems(type, userId);
         dispatch(itemsResived(content));
     } catch (error) {
         dispatch(requestFailed(error.message));

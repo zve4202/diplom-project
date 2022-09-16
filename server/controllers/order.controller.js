@@ -7,18 +7,30 @@ const { DATA_RECEIVED, DATA_UPDATED } = require("../config");
 const agg = (match) => [
     {
         $match: match
+    },
+    {
+        $sort: {
+            _id: -1
+        }
     }
 ];
 
 exports.getAll = async function (req, res, next) {
-    const { type } = req.params;
+    const { type, userId } = req.params;
+    if (userId !== req.user._id) {
+        if (req.user.role !== "admin") {
+            return res
+                .status(401)
+                .json({ status: 401, message: "Unauthorized" });
+        }
+    }
     const statusArray =
         type === "current"
             ? ["new", "assembled", "pendingPayment", "sent"]
             : ["delivered", "cancelled"];
 
     const match = {
-        userId: ObjectId(req.user._id),
+        userId: ObjectId(userId),
         status: { $in: statusArray }
     };
 
@@ -84,15 +96,22 @@ const aggList = (match) => [
 ];
 
 exports.getItems = async function (req, res, next) {
-    const { userId } = req.user;
-    const { type } = req.params;
+    const { type, userId } = req.params;
+    if (userId !== req.user._id) {
+        if (req.user.role !== "admin") {
+            return res
+                .status(401)
+                .json({ status: 401, message: "Unauthorized" });
+        }
+    }
+
     const statusArray =
         type === "current"
             ? ["new", "assembled", "pendingPayment", "sent"]
             : ["delivered", "cancelled"];
 
     const match = {
-        "order.userId": ObjectId(req.user._id),
+        "order.userId": ObjectId(userId),
         "order.status": { $in: statusArray }
     };
 

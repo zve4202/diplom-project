@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-const statuses = {
+export const statuses = {
     basket: "В корзине",
     checked: "Подтверждён",
     needpay: "Требуется оплата",

@@ -27,14 +27,23 @@ const checkParams = ({ params }) => {
                 ...params
             };
 
-            Object.keys(query).forEach((key) => {
-                if (key !== "show") {
-                    const value = query[key];
-                    if (value) {
-                        newParams[key] = value;
-                    }
+            const queryArr = Object.keys(query);
+            const testKey = "artist";
+            if (queryArr.includes(testKey)) {
+                const value = query[testKey];
+                if (value) {
+                    newParams[testKey] = value;
                 }
-            });
+            } else {
+                queryArr.forEach((key) => {
+                    if (key !== "show") {
+                        const value = query[key];
+                        if (value) {
+                            newParams[key] = value;
+                        }
+                    }
+                });
+            }
             return newParams;
         } catch (error) {
             console.log({ error: error.message });

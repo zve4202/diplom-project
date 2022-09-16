@@ -45,6 +45,7 @@ const schema = new Schema(
         },
         totalQty: { type: Number, default: 0 },
         totalPrice: { type: Number, default: 0 },
+        deliveryPrice: { type: Number, default: 0 },
         sumOfPay: { type: Number, default: 0 },
         checkedAt: { type: Date }
     },

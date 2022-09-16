@@ -29,6 +29,10 @@ export function getDeliveryBy(value) {
     );
 }
 
+export function getDeliveryNameBy(value) {
+    return getDeliveryBy(value).label;
+}
+
 export default {
     byRussianPost,
     byCompanySDEK,

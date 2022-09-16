@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import PropTypes from "prop-types";
-import { getPlaceOptions, loadAuthUser } from "../../../../store/auth";
 import { useDispatch, useSelector } from "react-redux";
+import PropTypes from "prop-types";
+
+import { getPlaceOptions, loadAuthUser } from "../../../../store/auth";
 import { resetDlvInfo, saveDlvInfo } from "../../../../store/basket";
 
 const PlaceIdField = (props) => {

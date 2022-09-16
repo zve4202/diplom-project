@@ -11,8 +11,8 @@ import { getAuth } from "../../../store/auth";
 const NavBar = () => {
     const { authUser, isAdmin } = useSelector(getAuth());
     return (
-        <header className="sticky-top">
-            <nav className="navbar card bg-light-gray">
+        <header className="sticky-top ">
+            <nav className="navbar bg-light bg-opacity-100 border-bottom">
                 <div className="container-fluid">
                     <ul className="nav">
                         <li className="nav-item">

@@ -36,6 +36,16 @@ export const cashInHand = {
     visible: [byCourier.value, onPickupPoint.value]
 };
 
+export function getPaymentBy(value) {
+    return [payOnDelivery, acquiring, sberbankReceipt, cashInHand].find(
+        (item) => item.value === value
+    );
+}
+
+export function getPaymentNameBy(value) {
+    return getPaymentBy(value).label;
+}
+
 export default {
     payOnDelivery,
     acquiring,

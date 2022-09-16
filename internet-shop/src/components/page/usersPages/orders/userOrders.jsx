@@ -1,10 +1,11 @@
 import React from "react";
+import PropTypes from "prop-types";
 import classNames from "classnames";
 import { useDispatch, useSelector } from "react-redux";
 import { updateSetting } from "../../../../store/setting";
 import OrderList from "./orderList";
 
-const UserOrders = () => {
+const UserOrders = ({ userId }) => {
     const dispatch = useDispatch();
 
     const orderName = "orders";
@@ -50,9 +51,13 @@ const UserOrders = () => {
                     </span>
                 </div>
             </div>
-            <OrderList selected={selectedTab} />
+            <OrderList userId={userId} selected={selectedTab} />
         </div>
     );
+};
+
+UserOrders.propTypes = {
+    userId: PropTypes.string.isRequired
 };
 
 export default UserOrders;

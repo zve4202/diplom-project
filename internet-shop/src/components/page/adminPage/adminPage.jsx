@@ -45,6 +45,14 @@ const AdminPage = () => {
                         />
                     </div>
                 )}
+                {selectedMenu.path === pathes.orderPath && (
+                    <div className="mt-3">
+                        <CategoryList
+                            name={selectedMenu.path}
+                            onItemSelect={onFilter}
+                        />
+                    </div>
+                )}
             </AdminSideBar>
             <ContentWrapper menu={selectedMenu}>
                 {selectedMenu.path === pathes.userPath && <UsersListPage />}

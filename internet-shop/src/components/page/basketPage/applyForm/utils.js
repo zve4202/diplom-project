@@ -1,4 +1,4 @@
-import defMap from "./applyMap";
+import defMap from "../../applyMap";
 
 export const valueOfName = (name) => {
     const value = defMap[name].value;

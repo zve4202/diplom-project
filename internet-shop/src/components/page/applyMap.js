@@ -8,12 +8,12 @@ import {
     isIndex,
     isRequired,
     requiredIF
-} from "../../../../utils/validator";
-import TextEdit from "../../../common/form/textEdit";
-import MaskEdit from "../../../common/form/maskEdit";
-import PlaceIdField from "./placeIdField";
-import SelectEdit from "../../../common/form/selectEdit";
-import MemoEdit from "../../../common/form/memoEdit";
+} from "../../utils/validator";
+import TextEdit from "../common/form/textEdit";
+import MaskEdit from "../common/form/maskEdit";
+import PlaceIdField from "./basketPage/applyForm/placeIdField";
+import SelectEdit from "../common/form/selectEdit";
+import MemoEdit from "../common/form/memoEdit";
 
 const methonds = {
     [isRequired]: { message: "Обязательная информация!" },

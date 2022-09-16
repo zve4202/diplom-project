@@ -2,10 +2,10 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
-import payments from "./payments";
-import deliveries from "./deliveries";
+import payments from "../../payments";
+import deliveries from "../../deliveries";
 import { updateDlvInfo, saveDlvInfo } from "../../../../store/basket";
-import fieldsMap from "./applyMap";
+import fieldsMap from "../../applyMap";
 import {
     createDefaults,
     createGroups,
